@@ -1,0 +1,58 @@
+@page
+@model chatter.view.Pages.account.Register
+@{
+    ViewData["Title"] = "Register";
+}
+<style>
+    .login-container {
+        background-color: blue;
+        height: 100vh;
+        display: flex;
+        background-color: lightgray;
+        justify-content: center;
+        align-items: center;
+    }
+    #login-form {
+        background-color: darkgray;
+        height: 400px;
+        width: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border-radius: 5px;
+    }
+    .input-field, .submit-button {
+        padding: 5px;
+        width: 300px;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        margin: 8px 0;
+    }
+    .submit-button {
+        background-color: skyblue;
+        font-size: 15px;
+        font-weight: bold;
+        font-style: oblique;
+    }
+</style>
+<div class="login-container">
+    <div id="login-form">
+        <form method="post" action="">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div>
+                <input type="text" asp-for="@Model.Logins.PhoneNumber" class="input-field" id="phone" placeholder="Phone">
+                <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
+            </div>
+            <div>
+                <input type="password" asp-for="@Model.Logins.Password" class="input-field"  id="password" placeholder="Password">
+                <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
+            </div>
+            <div>
+            <input type="submit" class="submit-button" value="Create Account">
+            </div>
+            <a href="/account/login">Login in</a>
+        </form>
+    </div>
+</div>

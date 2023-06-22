@@ -1,0 +1,6 @@
+﻿@if (User.Identity!.IsAuthenticated)
+{
+    <form method="get" asp-page="/Account/Logout">
+        <input type="submit" value="Logout" style="border: none;border-radius: 5px; font-size: 10px; font-weight: 500; padding: 5px; height: 100%; background-color: #ff7d7d6e"/>
+    </form>
+}

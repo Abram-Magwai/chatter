@@ -1,0 +1,489 @@
+﻿@page
+@using Microsoft.AspNetCore.Authorization
+@model IndexModel
+@{
+    ViewData["Title"] = "Chats";
+}
+@section Styles {
+    <style>
+        .background {
+            background-color: darkcyan;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+
+        #close {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 3px;
+            padding-top: 3px;
+        }
+
+        #close button {
+            background-color: transparent;
+            border: none;
+            height: 20px;
+            padding: 2px;
+            outline: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .new-contact-container,
+        .contact-list {
+            position: absolute;
+            left: 40%;
+            top: 20%;
+            z-index: 2;
+            background-color: lightgray;
+            width: 400px;
+            padding-bottom: 20px;
+        }
+
+        .available-contacts {
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        .contact-list {
+            height: 400px;
+        }
+
+        .contact-list.hide {
+            visibility: hidden;
+        }
+
+        .new-contact-container.hide {
+            visibility: hidden;
+        }
+
+        .new-contact-container #title,
+        .contact-list #title {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .new-contact-container span,
+        .contact-list span {
+            font-weight: 400;
+            font-style: italic;
+            width: 100%;
+            text-align: center;
+        }
+
+        #new-contact-form,
+        #contacts-blog {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .contact-container {
+            display: flex;
+            background-color: whitesmoke;
+            justify-content: space-between;
+            width: 300px;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .current-chats {
+            background-color: lightgray;
+            flex: 3;
+            height: 100vh;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .chat {
+            background-color: lightblue;
+            flex: 9;
+            height: 100vh;
+        }
+
+        .chat.hidden {
+            visibility: hidden;
+        }
+
+        .blog-title {
+            flex: 1;
+            display: flex;
+            margin-top: 10px;
+            margin-left: 10px
+        }
+
+        .add-account {
+            flex: 1;
+            display: flex;
+            justify-content: end;
+            align-items: center;
+        }
+
+        .add-account #create {
+            font-size: 10px;
+            border-color: whitesmoke;
+            outline: none;
+            background-color: whitesmoke;
+            margin-right: 5px;
+            padding: 5px;
+            font-weight: 500;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-topbar {
+            padding: 10px 0;
+            background-color: skyblue;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logout {
+            padding-right: 10px;
+            cursor: pointer;
+        }
+
+        .contact-details {
+            padding-top: 10px;
+            padding-left: 5px;
+            display: flex;
+            width: 180px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            flex-direction: column;
+        }
+
+        .contact-details #name {
+            font-weight: 700;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .contact-container .username {
+            font-size: 13px;
+            font-weight: 500;
+            font-family: sans-serif;
+        }
+
+        .contact-container .action {
+            color: blue;
+            font-style: italic;
+            background-color: lightgray;
+            padding: 5px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .contact-container .phone-number {
+            font-size: 11px;
+            font-weight: 200;
+            color: gray;
+        }
+
+        .contact-details #last-seen {
+            font-size: 12px;
+        }
+
+        .chats-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+            padding: 0 5px;
+        }
+
+        .chat-blog {
+            height: 70px;
+            background-color: whitesmoke;
+            margin: 0 5px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .chat-blog .picture {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 2;
+            height: 100%;
+        }
+
+        .chat-blog .chat-details {
+            display: flex;
+            flex-direction: column;
+            flex: 5;
+            height: 100%;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 5px;
+        }
+
+        .chat-blog .chat-details :first-child {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-blog .chat-details :first-child .number-of-messages {
+            background-color: blue;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            border-radius: 50%;
+        }
+
+        .profile-avatar {
+            height: 70px;
+            width: 70px;
+            border-radius: 50%;
+            background-color: lightgray;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .chat-details .name,
+        .incoming-message-content .name,
+        .outgoing-message-content .name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .chat-details .message,
+        .incoming-message-content .message,
+        .outgoing-message-content .message {
+            font-size: 11px;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .status {
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .message-info {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .time-sent {
+            font-size: 10px;
+        }
+
+        #message-body {
+            height: 80%;
+            overflow-y: scroll;
+        }
+
+        #message-body .date {
+            display: flex;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 500;
+            background-color: whitesmoke;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        #message-body .conversation-body {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+        }
+
+        #message-body .conversation-body .incoming-messages,
+        #message-body .conversation-body .outgoing-messages {
+            flex: 1;
+        }
+
+        .incoming-message-content,
+        .outgoing-message-content {
+            background-color: whitesmoke;
+            margin: 5px 0;
+            width: fit-content;
+            padding: 5px;
+            border-radius: 6px;
+        }
+
+        .incoming-message-content {
+            margin-right: 5px;
+        }
+
+        .outgoing-messages {
+            display: flex;
+            justify-content: end;
+        }
+
+        .input-field,
+        .submit-button {
+            padding: 5px;
+            width: 300px;
+            border-radius: 5px;
+            outline: none;
+            border: none;
+            margin: 8px 0;
+        }
+
+        .submit-button {
+            background-color: skyblue;
+            font-size: 15px;
+            font-weight: bold;
+            font-style: oblique;
+        }
+
+        #create-message {
+            position: absolute;
+            right: 5px;
+            bottom: 100px;
+            font-size: 10px;
+            background-color: blue;
+            border-radius: 50%;
+            height: 45px;
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+}
+<div class="background">
+    <div class="new-contact-container hide">
+        <div id="close">
+            <button id="close-btn">X</button>
+        </div>
+        <div id="title">
+            <span>Add new contact</span>
+        </div>
+        <div id="new-contact-form">
+            <form method="post" action="">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div>
+                    <input type="text" asp-for="@Model.AccountDetails.PhoneNumber" class="input-field" id="phone"
+                        placeholder="Phone">
+                    <div><span asp-validation-for="@Model.AccountDetails.PhoneNumber" class="text-danger"></span></div>
+                </div>
+                <div>
+                    <input type="text" asp-for="@Model.AccountDetails.UserName" class="input-field" id="username"
+                        placeholder="Username">
+                </div>
+                <div>
+                    <input type="button" class="submit-button" value="Add Contact">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="contact-list hide">
+        <div id="close">
+            <button id="close-btn">X</button>
+        </div>
+        <div id="title">
+            <span>Contacts</span>
+        </div>
+        <div id="contacts-blog">
+            <div class="available-contacts">
+                <span>No Contacts Available</span>
+            </div>
+        </div>
+    </div>
+    <div class="current-chats">
+        <div class="top">
+            <div class="blog-title">
+                <h6>Chats</h6>
+            </div>
+            <div class="add-account">
+                <div id="create">+ Contact</div>
+
+                <div class="logout">
+                    <partial name="_LogoutPartial" />
+                </div>
+            </div>
+        </div>
+        <div class="chats-container">
+            @foreach (var recentMessageDto in Model.RecentMessageDtos)
+            {
+                <div class="chat-blog">
+                    <div class="picture">
+                        <div class="profile-avatar" style="background-image: url(images/hacker.jpg); ">
+                        </div>
+                    </div>
+                    <div class="chat-details">
+                        <div>
+                            <div class="name blog-name">@recentMessageDto.ContactUserName</div>
+                            @if (recentMessageDto.UnreadMessages > 0)
+                            {
+                                <div class="number-of-messages">@recentMessageDto.UnreadMessages</div>
+                            }
+                        </div>
+                        <div class="message blog-message">
+                            @recentMessageDto.Context
+                        </div>
+                        <div class="message-info">
+                            <div class="status blog-status">@recentMessageDto.Status</div>
+                            <div class="time-sent blog-time-sent">@recentMessageDto.Time</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="chat hidden">
+        <div style="position: relative; height: 100vh">
+            <div class="chat-topbar">
+                <div class="contact-details">
+                    <span id="name"></span>
+                    <span id="last-seen"></span>
+                </div>
+            </div>
+            <div id="message-body"></div>
+            <div class="message-blog"
+                style="position: absolute;bottom: 15px; height: 50px; width: 100%; padding: 0 5px; outline: none">
+                <div class="input-message-box"
+                    style="background-color: whitesmoke; height: 100%; border-radius: 6px; display: flex">
+                    <input type="text" autofocus id="message" placeholder="Enter text" style="height: 100%; flex: 5">
+                    <input type="button" id="send-message" value="Send">
+                </div>
+            </div>
+        </div>
+    </div>
+    <form action="" method="post" id="connection-id-form" hidden>
+        <input type="text" name="" id="connection-id">
+        <input type="button" value="" id="send-connection-id">
+    </form>
+    <div id="create-message">Message</div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chats.js"></script>
+@* <script src="~/js/signal.js"></script> *@
