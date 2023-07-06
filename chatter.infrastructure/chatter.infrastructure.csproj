@@ -5,8 +5,8 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="3.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="microsoft.extensions.options" Version="7.0.0" />
-    <PackageReference Include="MongoDb.Driver" Version="2.18.0" />
+    <PackageReference Include="microsoft.extensions.options" Version="7.0.1" />
+    <PackageReference Include="MongoDb.Driver" Version="2.20.0" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>

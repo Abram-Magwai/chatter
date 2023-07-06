@@ -186,24 +186,11 @@ connection.on("UpdateChat", function (chat) {
             }
 
             messages.forEach(message => {
-                var today = new Date();
-                var yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                var csDate = message.Date.split("/");
-                var formatedDate = (csDate[1][0] == "0" ? csDate[1].replaceAll("0", "") : csDate[1]) + "/" + (csDate[2][0] == 0 ? csDate[1].replaceAll("0", "") : csDate[2]) + "/" + csDate[0];
-
-                if (formatedDate == today.toLocaleDateString()) {
-                    date = "Today";
-                } else if (formatedDate == yesterday.toLocaleDateString()) {
-                    date = "Yesterday";
-                }
-                else {
-                    date = message.Date
-                }
+                var csDate = message.Date;
 
                 var dateContainer = document.createElement("div");
                 dateContainer.classList.add("date");
-                dateContainer.innerHTML = date;
+                dateContainer.innerHTML = csDate;
 
                 var dateLines = document.querySelectorAll(".date");
                 var shouldAddDateLine = true;
@@ -370,40 +357,16 @@ connection.on("ReceiveMessage", function (chat) {
     //check if receiver was on our sender chat
     var nameTittle = document.querySelector("#name");
     if (nameTittle != null && nameTittle.innerHTML == chat.sentBy) { // was on the chat
-        var date = '';
         var messageBodyContainer = document.querySelector("#message-body");
-        var today = new Date();
-        var yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        var csDate = chat.date.split("/");
-        var formatedDate = (csDate[1][0] == "0" ? csDate[1].replaceAll("0", "") : csDate[1]) + "/" + (csDate[2][0] == 0 ? csDate[1].replaceAll("0", "") : csDate[2]) + "/" + csDate[0];
-
-        if (formatedDate == today.toLocaleDateString()) {
-            date = "Today";
-        } else if (formatedDate == yesterday.toLocaleDateString()) {
-            date = "Yesterday";
-        }
-        else {
-            date = chat.date
-        }
+        var csDate = chat.date;
 
         var dateContainer = document.createElement("div");
         dateContainer.classList.add("date");
-        dateContainer.innerHTML = date;
+        dateContainer.innerHTML = "Today";
 
         var dateLines = document.querySelectorAll(".date");
-        var shouldAddDateLine = true;
-        if (dateLines.length == 0) {
+        if (dateLines[dateLines.length - 1].innerHTML != "Today")
             messageBodyContainer.append(dateContainer);
-        } else {
-            dateLines.forEach(dateline => {
-                if (dateline.innerHTML == date)
-                    shouldAddDateLine = false;
-            })
-            if (shouldAddDateLine) {
-                messageBodyContainer.append(dateContainer);
-            }
-        }
 
 
         var conversationBodyContainer = document.createElement("div");
@@ -855,6 +818,8 @@ if (sendMessageButton != null) {
                 blogMessageContainer.innerHTML = textMessage
                 blogTimeSentContainer.innerHTML = timeSentContainer.innerHTML;
                 blogStatusContainer.innerHTML = "Sent";
+
+                openChat();
             }
             else { //chat exists
                 //updating chat blog details
@@ -882,17 +847,6 @@ if (sendMessageButton != null) {
                     return console.error(err.toString());
                 });
             });
-            // $.ajax({
-            //     url: '/?handler=Message',
-            //     method: 'POST',
-            //     headers: {
-            //         RequestVerificationToken:
-            //             $('input:hidden[name="__RequestVerificationToken"]').val()
-            //     },
-            //     data: {
-            //         messageDto: message
-            //     }
-            // })
         }
     });
 }
@@ -960,7 +914,7 @@ function openChat() {
             var nameTittle = document.querySelector("#name");
             var lastSeen = document.querySelector("#last-seen");
             nameTittle.innerHTML = json.ContactName;
-            lastSeen.innerHTML = json.LastSeen;
+            lastSeen.innerHTML = json.LastSeen != "Online" ? "Last seen " + json.LastSeen : json.LastSeen;
 
             var messages = json.Messages;
             var date = '';
@@ -972,24 +926,10 @@ function openChat() {
             }
 
             messages.forEach(message => {
-                var today = new Date();
-                var yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                var csDate = message.Date.split("/");
-                var formatedDate = (csDate[1][0] == "0" ? csDate[1].replaceAll("0", "") : csDate[1]) + "/" + (csDate[2][0] == 0 ? csDate[1].replaceAll("0", "") : csDate[2]) + "/" + csDate[0];
-
-                if (formatedDate == today.toLocaleDateString()) {
-                    date = "Today";
-                } else if (formatedDate == yesterday.toLocaleDateString()) {
-                    date = "Yesterday";
-                }
-                else {
-                    date = message.Date
-                }
-
+                var csDate = message.Date;
                 var dateContainer = document.createElement("div");
                 dateContainer.classList.add("date");
-                dateContainer.innerHTML = date;
+                dateContainer.innerHTML = csDate;
 
                 var dateLines = document.querySelectorAll(".date");
                 var shouldAddDateLine = true;
@@ -997,7 +937,7 @@ function openChat() {
                     messageBodyContainer.append(dateContainer);
                 } else {
                     dateLines.forEach(dateline => {
-                        if (dateline.innerHTML == date)
+                        if (dateline.innerHTML == csDate)
                             shouldAddDateLine = false;
                     })
                     if (shouldAddDateLine) {

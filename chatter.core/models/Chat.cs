@@ -21,7 +21,7 @@ namespace chatter.core.models
                if(DateTime.Parse(this.Time) == DateTime.Parse(other.Time)) return 0;
                return DateTime.Parse(this.Time) < DateTime.Parse(other.Time) ? -1 : 1;
             }
-            return DateTime.Parse(this.Date) < DateTime.Parse(other.Date) ? -1 : 1;
+            return this.Date == "Today" && other.Date == "Yesterday" ? -1 : 1;
         }
     }
 }

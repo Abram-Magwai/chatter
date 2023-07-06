@@ -29,6 +29,7 @@ namespace chatter.core.services
         {
             var contact = await _userService.GetUserByPhone(ContactPhoneNumber);
             var user = await _userService.GetUserByPhone(userPhoneNumber);
+
             var messageList = (await Task.Run(() => _messageCollection.AsQueryable().Where(message =>
             ((message.SenderPhoneNumber == user.UserName) && (message.ReceiverPhoneNumber == contact.UserName)) ||
             ((message.SenderPhoneNumber == contact.UserName && message.ReceiverPhoneNumber == user.UserName))
@@ -42,7 +43,7 @@ namespace chatter.core.services
                     await _messageCollection.UpdateAsync(message.Id, message);
                 }
             }
-            await GetRecentMessages(userPhoneNumber);
+
             var myContact = _contactCollection.AsQueryable().Where(c => (c.CreatorPhoneNumber == userPhoneNumber) && (c.PhoneNumber == contact.UserName)).FirstOrDefault();
             string contactName = myContact == null ? contact.UserName : myContact.UserName;
             var lastSeen = string.Empty;
@@ -66,9 +67,18 @@ namespace chatter.core.services
             List<Chat> chats = new();
             foreach (var message in messageList)
             {
+                string messageDay = message.TimeSent.ToString("d");
+                string yesterday = DateTime.Now.AddDays(-1).ToString("d");
+                string today = DateTime.Now.ToString("d");
+
+                if (messageDay == today)
+                    messageDay = "Today";
+                else if (messageDay == yesterday)
+                    messageDay = "Yesterday";
+
                 var chat = new Chat
                 {
-                    Date = message.TimeSent.ToString("d"),
+                    Date = messageDay,
                     Context = message.Context,
                     Type = message.ReceiverPhoneNumber == userPhoneNumber ? MessageTypesEnums.Received.ToString() : MessageTypesEnums.Sent.ToString(),
                     Time = message.TimeSent.AddHours(2).Hour + ":" + message.TimeSent.Minute
@@ -78,7 +88,7 @@ namespace chatter.core.services
                 chats.Add(chat);
             }
             chats.Sort();
-            ConversationDto conversation = new ConversationDto
+            ConversationDto conversation = new()
             {
                 ContactName = contactName,
                 Messages = chats,
