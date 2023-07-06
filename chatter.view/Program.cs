@@ -30,24 +30,6 @@ services.AddIdentity<ApplicationUser, ApplicationRole>()
     dbSettings!.ConnectionString, dbSettings.DatabaseName
 );
 
-
-// services.AddAuthentication(options => {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(o => {
-//     o.TokenValidationParameters = new TokenValidationParameters
-//     {
-//         ValidIssuer = appSettings.Issuer,
-//         ValidAudience = appSettings.Audience,
-//         IssuerSigningKey = new SymmetricSecurityKey
-//         (Encoding.UTF8.GetBytes(appSettings.SecretKey)),
-//         ValidateIssuer = true,
-//         ValidateAudience = false,
-//         ValidateLifetime = false,
-//         ValidateIssuerSigningKey = true
-//     };
-// });
 services.AddSignalR();
 services.AddScoped<ISignalRHub, SignalRHub>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -55,7 +37,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 {
     options.Cookie.Name = "chat";
     options.LoginPath = "/account/login";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     options.SlidingExpiration = true;
     options.LogoutPath = "/account/login";
     options.SlidingExpiration = true;
