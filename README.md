@@ -34,6 +34,6 @@ The Chatting Application is a real-time chat platform that allows users to engag
 1. Clone the repository:
 
    ```shell
-   git clone https://github.com/your-username/chatting-application.git
+   git clone https://github.com/Abram-Magwai/chatter.git
 ## Contributing
 Contributions are welcome! If you encounter any issues or have suggestions for improvements, please feel free to submit a pull request or create an issue in the repository.
