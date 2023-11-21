@@ -19,7 +19,7 @@ var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppS
 services.Configure<DbSettings>(builder.Configuration.GetSection(nameof(DbSettings)));
 var dbSettings = builder.Configuration.GetSection(nameof(DbSettings)).Get<DbSettings>();
 
-    services.AddScoped<IUserService, UserService>();
+services.AddScoped<IUserService, UserService>();
 services.AddScoped<IProfileService, ProfileService>();
 services.AddScoped<IMessageService, MessageService>();
 services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));

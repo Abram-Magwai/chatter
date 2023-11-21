@@ -1,6 +1,19 @@
-﻿@if (User.Identity!.IsAuthenticated)
+﻿<style>
+    #logout-button {
+        border: none;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: 500;
+        padding: 5px;
+        height: 100%;
+        background-color: #f33737
+    }
+</style>
+@if (User.Identity!.IsAuthenticated)
 {
     <form method="get" asp-page="/Account/Logout">
-        <input type="submit" value="Logout" style="border: none;border-radius: 5px; font-size: 10px; font-weight: 500; padding: 5px; height: 100%; background-color: #ff7d7d6e"/>
+        <button type="submit" value="Logout" id="logout-button">
+            <i class="bi bi-box-arrow-left" style="font-size: 20px"></i>
+        </button>
     </form>
 }

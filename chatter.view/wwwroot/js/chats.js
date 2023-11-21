@@ -1,5 +1,10 @@
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-var connectionId = '';
+
+
+/*
+    Connect to SignalR server
+    sends connection id of the current user to the database since it is used to receive instant messages
+*/
 connection.start().then(function () {
     $.ajax({
         url: '/?handler=UpdateConnectionId',
@@ -12,6 +17,7 @@ connection.start().then(function () {
             ConnectionId: connection.connectionId
         }
     });
+    //Once connected check messages send to the user
     checkRecentMessages();
 }).catch(function (err) {
     return console.error(err.toString());
@@ -23,14 +29,7 @@ var blogs = document.querySelectorAll(".chat-blog");
 var statuses = document.querySelectorAll(".blog-status");
 var chatDetails = document.querySelectorAll(".chat-details");
 
-// chatDetails.forEach(chatDetail => {
-//     var messageContainer = chatDetail.children[1];
-//     if(messageContainer.scrollHeight > 17) {
-//         var nospace = messageContainer.innerHTML.trim();
-//         var message = nospace.substring(0, messageContainer.scrollHeight/9);
-//         messageContainer.innerHTML = message;
-//     }
-// });
+//Sending message to another person
 connection.on("UpdateSentChat", function (chat) {
     var blogNames = document.querySelectorAll(".blog-name");
     var statuses = document.querySelectorAll(".blog-status");
@@ -48,6 +47,8 @@ connection.on("UpdateSentChat", function (chat) {
         }
     });
 });
+
+//Received message
 connection.on("UpdateReceivedChat", function (chat) {
     blogNames.forEach((blogName, index) => {
         if (blogName.innerHTML == chat.sentBy) {
@@ -68,7 +69,6 @@ connection.on("UpdateReceivedChat", function (chat) {
             }
             document.querySelectorAll(".blog-time-sent")[index].innerHTML = chat.time;
             if (chat.status == "Sent") {
-                var unreadMessages = document.querySelectorAll(".number-of-messages");
                 if (blogs[index].children[1].children[0].children.length == 1) {
                     var unreadMessagesContainer = document.createElement("div");
                     unreadMessagesContainer.classList.add("number-of-messages");
@@ -91,6 +91,8 @@ connection.on("UpdateReceivedChat", function (chat) {
         }
     }
 });
+
+//Structure chat history, putting received messages on the left and sent messages on the right
 connection.on("UpdateChat", function (chat) {
     if (chat.type == "Received") {
         blogNames.forEach((blogName, index) => {
@@ -293,7 +295,11 @@ connection.on("ReceiveMessage", function (chat) {
 
         var profileAvatarContainer = document.createElement("div");
         profileAvatarContainer.classList.add("profile-avatar");
-        profileAvatarContainer.style.backgroundImage = "url(images/hacker.jpg)";
+        var iElement = document.createElement("i");
+        iElement.classList.add("bi");
+        iElement.classList.add("bi-person");
+        iElement.style.fontSize = "40px";
+        profileAvatarContainer.appendChild(iElement);
 
         var chatDetailsContainer = document.createElement("div");
         chatDetailsContainer.classList.add("chat-details");
@@ -355,75 +361,76 @@ connection.on("ReceiveMessage", function (chat) {
     }
 
     //check if receiver was on our sender chat
+    if (!chatContainer.classList.contains("hidden")) {
     var nameTittle = document.querySelector("#name");
-    if (nameTittle != null && nameTittle.innerHTML == chat.sentBy) { // was on the chat
-        var messageBodyContainer = document.querySelector("#message-body");
-        var csDate = chat.date;
+        if (nameTittle != null && nameTittle.innerHTML == chat.sentBy) { // was on the chat
+            var messageBodyContainer = document.querySelector("#message-body");
 
-        var dateContainer = document.createElement("div");
-        dateContainer.classList.add("date");
-        dateContainer.innerHTML = "Today";
+            var dateContainer = document.createElement("div");
+            dateContainer.classList.add("date");
+            dateContainer.innerHTML = "Today";
 
-        var dateLines = document.querySelectorAll(".date");
-        if (dateLines[dateLines.length - 1].innerHTML != "Today")
-            messageBodyContainer.append(dateContainer);
+            var dateLines = document.querySelectorAll(".date");
+            if (dateLines[dateLines.length - 1].innerHTML != "Today")
+                messageBodyContainer.append(dateContainer);
 
 
-        var conversationBodyContainer = document.createElement("div");
-        conversationBodyContainer.classList.add("conversation-body");
+            var conversationBodyContainer = document.createElement("div");
+            conversationBodyContainer.classList.add("conversation-body");
 
-        var nameContainer = document.createElement("div");
-        nameContainer.classList.add("name");
+            var nameContainer = document.createElement("div");
+            nameContainer.classList.add("name");
 
-        var messageContainer = document.createElement("div");
-        messageContainer.classList.add("message");
+            var messageContainer = document.createElement("div");
+            messageContainer.classList.add("message");
 
-        var messageInfoContainer = document.createElement("div");
-        messageInfoContainer.classList.add("message-info");
+            var messageInfoContainer = document.createElement("div");
+            messageInfoContainer.classList.add("message-info");
 
-        var statusContainer = document.createElement("div");
-        statusContainer.classList.add("status");
+            var statusContainer = document.createElement("div");
+            statusContainer.classList.add("status");
 
-        var timeSentContainer = document.createElement("div");
-        timeSentContainer.classList.add("time-sent");
+            var timeSentContainer = document.createElement("div");
+            timeSentContainer.classList.add("time-sent");
 
-        nameContainer.innerHTML = document.querySelector("#name").innerHTML;
-        messageContainer.innerHTML = chat.context;
-        statusContainer.innerHTML = "";
-        timeSentContainer.innerHTML = chat.time;
+            nameContainer.innerHTML = document.querySelector("#name").innerHTML;
+            messageContainer.innerHTML = chat.context;
+            statusContainer.innerHTML = "";
+            timeSentContainer.innerHTML = chat.time;
 
-        var incomingContainer = document.createElement("div");
-        incomingContainer.classList.add("incoming");
+            var incomingContainer = document.createElement("div");
+            incomingContainer.classList.add("incoming");
 
-        var incomingMessagesContainer = document.createElement("div");
-        incomingMessagesContainer.classList.add("incoming-messages");
+            var incomingMessagesContainer = document.createElement("div");
+            incomingMessagesContainer.classList.add("incoming-messages");
 
-        var incomingMessageContentContainer = document.createElement("div");
-        incomingMessageContentContainer.classList.add("incoming-message-content");
-        messageInfoContainer.append(statusContainer, timeSentContainer);
+            var incomingMessageContentContainer = document.createElement("div");
+            incomingMessageContentContainer.classList.add("incoming-message-content");
+            messageInfoContainer.append(statusContainer, timeSentContainer);
 
-        messageBodyContainer.append(incomingContainer);
-        incomingContainer.append(conversationBodyContainer);
-        conversationBodyContainer.append(incomingMessagesContainer);
-        incomingMessagesContainer.append(incomingMessageContentContainer);
-        incomingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
+            messageBodyContainer.append(incomingContainer);
+            incomingContainer.append(conversationBodyContainer);
+            conversationBodyContainer.append(incomingMessagesContainer);
+            incomingMessagesContainer.append(incomingMessageContentContainer);
+            incomingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
 
-        var outgoings = document.querySelectorAll(".outgoing-messages");
-        if (outgoings.length >= 1) {
-            outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = "";
-        }
+            var outgoings = document.querySelectorAll(".outgoing-messages");
+            if (outgoings.length >= 1) {
+                outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = "";
+            }
 
-        //invoke update with read status
-        var userPhoneNumber = '';
-        $.ajax({
-            url: '/?handler=PhoneNumber',
-            method: 'GET',
-        }).done(result => {
-            userPhoneNumber = result;
-            connection.invoke("UpdateSentMessageStatus", "Read", chat.sentBy, userPhoneNumber).catch(function (err) {
-                return console.error(err.toString());
+            //invoke update with read status
+            var userPhoneNumber = '';
+            $.ajax({
+                url: '/?handler=PhoneNumber',
+                method: 'GET',
+            }).done(result => {
+                userPhoneNumber = result;
+                connection.invoke("UpdateSentMessageStatus", "Read", chat.sentBy, userPhoneNumber).catch(function (err) {
+                    return console.error(err.toString());
+                });
             });
-        });
+        }
     } else {
         var blogNames = document.querySelectorAll(".blog-name");
         var blogs = document.querySelectorAll(".chat-blog");
@@ -461,31 +468,34 @@ connection.on("ReceiveMessage", function (chat) {
     openChat();
 });
 var closeButtons = document.querySelectorAll("#close-btn");
-var contactContainer = document.querySelector(".new-contact-container");
-var contactsContainer = document.querySelector(".contact-list");
-var newContactL = $(".new-contact-container");
+var newContactModal = document.querySelector(".new-contact-modal");
+var contactListModal= document.querySelector(".contact-list-modal");
 closeButtons.forEach((closeButton, index) => {
     closeButton.addEventListener("click", () => {
         if (index == 0) {
-            if (!contactContainer.classList.contains("hide")) {
-                contactContainer.classList.add("hide");
+            if (!newContactModal.classList.contains("hide")) {
+                newContactModal.classList.add("hide");
             }
         } else {
-            if (!contactsContainer.classList.contains("hide")) {
-                contactsContainer.classList.add("hide");
+            if (!contactListModal.classList.contains("hide")) {
+                contactListModal.classList.add("hide");
             }
         }
     });
 });
 
-var createContactButton = document.querySelector("#create");
-if (createContactButton != null) {
-    createContactButton.addEventListener("click", () => {
-        if (contactContainer.classList.contains("hide")) {
-            contactContainer.classList.remove("hide")
+var createContactButtons = document.querySelectorAll("#create");
+createContactButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (newContactModal.classList.contains("hide")) {
+            newContactModal.classList.remove("hide")
         }
-    });
-}
+        if (!contactListModal.classList.contains("hide")) {
+            contactListModal.classList.add("hide")
+        }
+    })
+});
+
 var newMessageButton = document.querySelector("#create-message");
 newMessageButton.addEventListener("click", () => {
     //Send request and get data
@@ -527,22 +537,27 @@ newMessageButton.addEventListener("click", () => {
                 contactContainer.appendChild(actionContainer);
                 availableContactsContainer.appendChild(contactContainer);
             })
-            if (contactsContainer.classList.contains("hide")) {
-                contactsContainer.classList.remove("hide")
+            //Hide new contact form modal if visible
+            if (!newContactModal.classList.contains("hide")) {
+                newContactModal.classList.add("hide")
+            }
+            //Show contact list modal if not visible
+            if (contactListModal.classList.contains("hide")) {
+                contactListModal.classList.remove("hide")
             }
             MessageFunction();
         })
 });
 openChat();
 var phoneNumber;
+
 function MessageFunction() {
     var actionButtons = document.querySelectorAll(".action");
     actionButtons.forEach((actionButton, index) => {
         if (actionButton.innerHTML.includes("Message")) {
             actionButton.addEventListener("click", () => {
-                var contactsContainer = document.querySelector(".contact-list");
-                if (!contactsContainer.classList.contains("hide")) {
-                    contactsContainer.classList.add("hide");
+                if (!contactListModal.classList.contains("hide")) {
+                    contactListModal.classList.add("hide");
                 }
                 var chatContainer = document.querySelector(".chat");
                 if (chatContainer.classList.contains("hidden")) {
@@ -773,7 +788,11 @@ if (sendMessageButton != null) {
 
                 var profileAvatarContainer = document.createElement("div");
                 profileAvatarContainer.classList.add("profile-avatar");
-                profileAvatarContainer.style.backgroundImage = "url(images/hacker.jpg)";
+                var iElement = document.createElement("i");
+                iElement.classList.add("bi");
+                iElement.classList.add("bi-person");
+                iElement.style.fontSize = "40px";
+                profileAvatarContainer.appendChild(iElement);
 
                 var chatDetailsContainer = document.createElement("div");
                 chatDetailsContainer.classList.add("chat-details");
@@ -1023,6 +1042,15 @@ function checkRecentMessages() {
         });
     }
 }
+//closing open chat
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' || event.keyCode === 27) {
+        var chatContainer = document.querySelector(".chat");
+        if (!chatContainer.classList.contains("hidden")) {
+            chatContainer.classList.add("hidden");
+        }
+    }
+});
 
 class Message {
     constructor(

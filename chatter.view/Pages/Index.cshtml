@@ -7,7 +7,7 @@
 @section Styles {
     <style>
         .background {
-            background-color: darkcyan;
+            background-color: lightgray;
             display: flex;
             flex-direction: row;
             position: relative;
@@ -31,15 +31,16 @@
             cursor: pointer;
         }
 
-        .new-contact-container,
-        .contact-list {
+        .new-contact-modal,
+        .contact-list-modal {
             position: absolute;
             left: 40%;
             top: 20%;
             z-index: 2;
-            background-color: lightgray;
+            background-color: darkcyan;
             width: 400px;
             padding-bottom: 20px;
+            border-radius: 10px;
         }
 
         .available-contacts {
@@ -52,27 +53,28 @@
             background: transparent;
         }
 
-        .contact-list {
-            height: 400px;
+        .contact-list-modal {
+            min-height: 455px;
+            border-radius: 10px;
         }
 
-        .contact-list.hide {
+        .contact-list-modal.hide {
             visibility: hidden;
         }
 
-        .new-contact-container.hide {
+        .new-contact-modal.hide {
             visibility: hidden;
         }
 
-        .new-contact-container #title,
+        .new-contact-modal #title,
         .contact-list #title {
             margin-top: 10px;
             display: flex;
             justify-content: center;
         }
 
-        .new-contact-container span,
-        .contact-list span {
+        .new-contact-modal span,
+        .contact-list-modal span {
             font-weight: 400;
             font-style: italic;
             width: 100%;
@@ -99,7 +101,7 @@
         }
 
         .current-chats {
-            background-color: lightgray;
+            background-color: darkcyan;
             flex: 3;
             height: 100vh;
         }
@@ -131,6 +133,7 @@
             display: flex;
             justify-content: end;
             align-items: center;
+            margin-top: 5px;
         }
 
         .add-account #create {
@@ -256,12 +259,16 @@
         }
 
         .profile-avatar {
-            height: 70px;
-            width: 70px;
+            height: 65px;
+            width: 65px;
+            margin-left: 5px;
             border-radius: 50%;
             background-color: lightgray;
             background-size: cover;
             background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .chat-details .name,
@@ -369,15 +376,27 @@
             color: #fff;
             cursor: pointer;
         }
+
+        .add-contact {
+            width: 100%;
+            background-color: lightgray;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer
+        }
     </style>
 }
 <div class="background">
-    <div class="new-contact-container hide">
+    <div class="new-contact-modal hide">
         <div id="close">
-            <button id="close-btn">X</button>
+            <button id="close-btn">
+                <i class="bi bi-x-circle" style="font-size: 20px"></i>
+            </button>
         </div>
         <div id="title">
-            <span>Add new contact</span>
+            <span style="text-align: center">Add new contact</span>
         </div>
         <div id="new-contact-form">
             <form method="post" action="">
@@ -397,16 +416,22 @@
             </form>
         </div>
     </div>
-    <div class="contact-list hide">
+    <div class="contact-list-modal hide">
         <div id="close">
-            <button id="close-btn">X</button>
+            <button id="close-btn">
+                <i class="bi bi-x-circle" style="font-size: 20px"></i>
+            </button>
         </div>
-        <div id="title">
-            <span>Contacts</span>
+        <div id="title" style="text-align: center">
+            <span >Contacts</span>
         </div>
         <div id="contacts-blog">
             <div class="available-contacts">
                 <span>No Contacts Available</span>
+                <div class="add-contact" id="create">
+                    <i class="bi bi-person-add" style="font-size: 20px"></i> 
+                    <span style="font-size: 15px">Add New Contact</span>
+                </div>
             </div>
         </div>
     </div>
@@ -416,7 +441,9 @@
                 <h6>Chats</h6>
             </div>
             <div class="add-account">
-                <div id="create">+ Contact</div>
+                <div id="create">
+                    <i class="bi bi-person-add" style="font-size: 20px"></i>
+                </div>
 
                 <div class="logout">
                     <partial name="_LogoutPartial" />
@@ -428,7 +455,8 @@
             {
                 <div class="chat-blog">
                     <div class="picture">
-                        <div class="profile-avatar" style="background-image: url(images/hacker.jpg); ">
+                        <div class="profile-avatar">
+                            <i class="bi bi-person" style="font-size: 40px"></i>
                         </div>
                     </div>
                     <div class="chat-details">
@@ -463,9 +491,9 @@
             <div class="message-blog"
                 style="position: absolute;bottom: 15px; height: 50px; width: 100%; padding: 0 5px; outline: none">
                 <div class="input-message-box"
-                    style="background-color: whitesmoke; height: 100%; border-radius: 6px; display: flex">
-                    <input type="text" autofocus id="message" placeholder="Enter text" style="height: 100%; flex: 5">
-                    <input type="button" id="send-message" value="Send">
+                    style="height: 100%; border-radius: 6px; display: flex">
+                    <input type="text" autofocus id="message" placeholder="Enter text" style="height: 100%; flex: 5; padding: 0 5px; border: none; border-radius: 10px">
+                    <button id="send-message" style="border: none; background-color: transparent"><i class="bi bi-send" style="font-size: 20px"></i></button>
                 </div>
             </div>
         </div>
@@ -474,7 +502,10 @@
         <input type="text" name="" id="connection-id">
         <input type="button" value="" id="send-connection-id">
     </form>
-    <div id="create-message">Message</div>
+
+    <div id="create-message">
+        <i class="bi bi-chat-right-dots" style="font-size: 20px"></i>
+    </div>
 </div>
 
 @section Scripts {
