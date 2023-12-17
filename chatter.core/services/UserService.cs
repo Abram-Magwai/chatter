@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using chatter.core.entities;
 using chatter.core.interfaces;
 using chatter.core.models;
@@ -15,26 +11,25 @@ namespace chatter.core.services
     public class UserService : IUserService
     {
         UserManager<ApplicationUser> _applicationUser;
-        SignInManager<ApplicationUser> _signInManager;
 
-        public UserService(UserManager<ApplicationUser> applicationUser, SignInManager<ApplicationUser> signInManager)
+        public UserService(UserManager<ApplicationUser> applicationUser)
         {
             _applicationUser = applicationUser;
-            _signInManager = signInManager;
         }
-        public async Task CreateUserAsync(string Email, string Password)
+        public async Task<bool> CreateUserAsync(string phone, string Password)
         {
-            if (!string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password))
+            if (!string.IsNullOrWhiteSpace(phone) && !string.IsNullOrWhiteSpace(Password))
             {
-                ApplicationUser applicationUser = new ApplicationUser { UserName = Email, Email = Email };
-                // _userRepository.InsertOne(applicationUser);
+                ApplicationUser applicationUser = new() { 
+                    UserName = phone, 
+                    PhoneNumber = phone 
+                };
                 string error;
                 try
                 {
-                    IdentityResult identityResult = await _applicationUser.CreateAsync(
-                    applicationUser,
-                    Password
-                );
+                    IdentityResult identityResult = await _applicationUser.CreateAsync(applicationUser, Password);
+                    if (identityResult.Succeeded) return true;
+                    else return false;
                 }
                 catch (Exception e)
                 {
@@ -42,8 +37,7 @@ namespace chatter.core.services
                     error = e.ToString();
                 }                
             }
-            else
-                throw new Exception("Invalid credentials");
+            return false;
         }
         public async Task<ApplicationUser> GetUser(User user)
         {
@@ -56,8 +50,7 @@ namespace chatter.core.services
         public async Task<ApplicationUser> GetUserByPhone(string phone)
         {
             ApplicationUser currentUser = await _applicationUser.FindByNameAsync(phone);
-            if(currentUser == null) throw new Exception("User doesn't exists");
-            return currentUser;       
+            return currentUser == null ? throw new Exception("User doesn't exists") : currentUser;
         }
         public async Task<ClaimsIdentity> AuthenticateAsync(User user, HttpContext httpContext)
         {
@@ -66,7 +59,6 @@ namespace chatter.core.services
             {
                 appUser.Result.IsOnline = true;
                 await _applicationUser.UpdateAsync(appUser.Result);
-                var claimsList = appUser.Result.Claims;
                 List<Claim> claims = new();
                 claims.Add(new Claim(type: ClaimTypes.MobilePhone, appUser.Result.UserName));
 

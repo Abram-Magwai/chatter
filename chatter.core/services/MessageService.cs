@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using chatter.core.dtos;
 using chatter.core.entities;
 using chatter.core.enums;

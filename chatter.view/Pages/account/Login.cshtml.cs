@@ -1,34 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using chatter.core.entities;
 using chatter.core.interfaces;
 using chatter.core.models;
 using chatter.view.models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 namespace chatter.view.Pages.account
 {
     public class Login : PageModel
     {
-        private readonly ILogger<Login> _logger;
         private readonly IUserService _userService;
         [BindProperty]
         public LoginCredentials Logins { get; set; } = null!;
-        private readonly ISignalRHub _signalRHub;
-        public Login(ILogger<Login> logger, IUserService userService, ISignalRHub signalRHub)
+        public Login(IUserService userService)
         {
-            _logger = logger;
             _userService = userService;
-            _signalRHub = signalRHub;
         }
 
         public void OnGet()
@@ -48,6 +36,10 @@ namespace chatter.view.Pages.account
                         new AuthenticationProperties() { IsPersistent = true }
                     );
                     return RedirectToPage("/Index");
+                }else
+                {
+                    ViewData["errorMessage"] = "Incorrect Credentials";
+                    return Page();
                 }
             }
             return Page();

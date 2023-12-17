@@ -50,8 +50,12 @@
                 <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
             </div>
             <div>
-            <input type="submit" class="submit-button" value="Create Account">
+                <input type="submit" class="submit-button" value="Create Account">
             </div>
+            @if (ViewData["errorMessage"] != null)
+            {
+                <span style="color: red">@ViewData["errorMessage"]</span><br />
+            }
             <a href="/account/login">Login in</a>
         </form>
     </div>
