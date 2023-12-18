@@ -4,32 +4,61 @@
     ViewData["Title"] = "Login";
 }
 <style>
+    /* Usable variables */
+    :root {
+        --primary-clr: #607D8B;
+        --secondary-clr: #FF9800;
+        --accent-clr: #03A9F4;
+        --bg-clr: #eceff1;
+        --white-clr: #fff;
+        --black-clr: #000;
+        --grey-clr: #808080;
+        --ff-headline: 'Poppins', sans-serif;
+        --ff-body: 'Open Sans', sans-serif;
+    }
+
+    *, *::after, *::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     .login-container {
-        background-color: blue;
-        background-image: url("~/images/background.jpg");
-        background-repeat: no-repeat;
-        background-position: center;
+        font-family: var(--ff-body);
+        background-color: var(--bg-clr);
         height: 100vh;
+        min-height: 540px;
         display: flex;
-        background-color: lightgray;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        gap: 1.5rem;
     }
 
     #login-form {
-        background-color: darkgray;
-        height: 400px;
-        width: 400px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 1.25rem;
+        text-align: center;
+        background-color: transparent;
+        height: 400px;
+        width: 400px;
         position: relative;
+        border: 1px solid var(--primary-clr);
         border-radius: 5px;
     }
 
+        #login-form > h1 {
+            font-family: var(--ff-headline);
+            font-size: 30px;
+            font-weight: 600;
+        }
+
     .input-field,
     .submit-button {
-        padding: 5px;
+        padding: 8px 24px;
         width: 300px;
         border-radius: 5px;
         outline: none;
@@ -38,35 +67,112 @@
     }
 
     .submit-button {
-        background-color: skyblue;
-        font-size: 15px;
+        background-color: var(--primary-clr);
+        color: var(--white-clr);
         font-weight: bold;
-        font-style: oblique;
+        transition: background-color 0.3s ease;
+    }
+
+        .submit-button:hover {
+            opacity: 0.8;
+        }
+
+    ._question {
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+        ._question span {
+            margin-right: 0.5rem;
+        }
+
+    ._footer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.875rem;
+        color: var(--grey-clr);
+        text-align: center;
+    }
+
+    ._footer-links {
+        display: flex;
+        gap: 0.875rem;
+    }
+
+        ._footer-links > a {
+            text-decoration: none;
+            color: unset;
+        }
+
+    @@media only screen and (max-width: 400px) {
+        .login-container {
+            font-size: 90%;
+        }
+
+        #login-form {
+            height: auto;
+            width: 100%;
+            border: none;
+        }
+
+            #login-form > form {
+                width: 90%;
+            }
+
+        .input-field,
+        .submit-button {
+            padding: 8px 24px;
+            width: 100%;
+        }
+
+        ._footer {
+            width: 95%;
+        }
+
+        ._footer-links {
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
     }
 </style>
 <div class="login-container">
     <div id="login-form">
+        <h1>Login</h1>
         <form action="" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div>
                 <input type="text" asp-for="@Model.Logins.PhoneNumber" class="input-field" id="phone"
-                    placeholder="Phone">
+                       placeholder="Phone">
                 <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
             </div>
             <div>
                 <input type="password" asp-for="@Model.Logins.Password" class="input-field" id="password"
-                    placeholder="Password">
+                       placeholder="Password">
                 <div><span asp-validation-for="@Model.Logins.Password" class="text-danger"></span></div>
             </div>
             <div>
                 <input type="submit" class="submit-button" value="Login">
             </div>
-            <a href="/account/register">Don't have an account?</a>
+            <p class="_question"><span>Don't have an account?</span><a href="/account/register">Register</a></p>
             @if (ViewData["errorMessage"] != null)
             {
-                <br><span style="color: red">@ViewBag.errorMessage</span>
+                <br>
+
+                <span class="text-danger">@ViewBag.errorMessage</span>
             }
         </form>
+    </div>
+    <div class="_footer">
+        <div class="_footer-links">
+            <a href="/terms">About</a>
+            <a href="/terms">Help</a>
+            <a href="/terms">Terms and Conditions</a>
+            <a href="/privacy">Privacy</a>
+        </div>
+        <p>Chatter &copy; 2023. All Rights Reserved.</p>
     </div>
 </div>
 @section Scripts {
