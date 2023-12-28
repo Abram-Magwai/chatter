@@ -6,8 +6,28 @@
 }
 @section Styles {
     <style>
+        /* Usable variables */
+        :root {
+            --primary-clr: #607D8B;
+            --secondary-clr: #FF9800;
+            --accent-clr: #03A9F4;
+            --bg-clr: #eceff1;
+            --white-clr: #fff;
+            --black-clr: #000;
+            --grey-clr: #808080;
+            --light-clr: #108080;
+            --ff-headline: 'Poppins', sans-serif;
+            --ff-body: 'Open Sans', sans-serif;
+        }
+
+        *, *::after, *::before {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .background {
-            background-color: lightgray;
+            background-color: var(--bg-clr);
             display: flex;
             flex-direction: row;
             position: relative;
@@ -37,7 +57,7 @@
             left: 40%;
             top: 20%;
             z-index: 2;
-            background-color: darkcyan;
+            background-color: var(--bg-clr);
             width: 400px;
             padding-bottom: 20px;
             border-radius: 10px;
@@ -90,7 +110,8 @@
 
         .contact-container {
             display: flex;
-            background-color: whitesmoke;
+            background-color: transparent;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
             justify-content: space-between;
             width: 300px;
             align-items: center;
@@ -101,20 +122,26 @@
         }
 
         .current-chats {
-            background-color: darkcyan;
-            flex: 3;
+            background-color: var(--white-clr);
+            width: 350px;
             height: 100vh;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+
+            position: relative;
         }
 
         .top {
             display: flex;
-            justify-content: space-evenly;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px 0 16px;
         }
 
         .chat {
-            background-color: lightblue;
-            flex: 9;
-            height: 100vh;
+            background-color: transparent;
+            flex: 1;
+            position: relative;
+            margin-left: 1px;
         }
 
         .chat.hidden {
@@ -128,58 +155,48 @@
             margin-left: 10px
         }
 
-        .add-account {
-            flex: 1;
-            display: flex;
-            justify-content: end;
-            align-items: center;
-            margin-top: 5px;
-        }
-
-        .add-account #create {
-            font-size: 10px;
-            border-color: whitesmoke;
-            outline: none;
-            background-color: whitesmoke;
-            margin-right: 5px;
-            padding: 5px;
-            font-weight: 500;
-            border-radius: 5px;
+        #create {
+            background-color: transparent;
+            font-weight: 700;
             cursor: pointer;
         }
 
         .chat-topbar {
-            padding: 10px 0;
-            background-color: skyblue;
+            padding: 10px 16px;
+            background-color: var(--white-clr);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
         }
 
         .logout {
             padding-right: 10px;
             cursor: pointer;
+            transition: all .3s ease-in;
         }
 
         .contact-details {
-            padding-top: 10px;
-            padding-left: 5px;
             display: flex;
-            width: 180px;
-            padding: 0 10px;
+            width: 100%;
             box-sizing: border-box;
             flex-direction: column;
         }
 
         .contact-details #name {
+            font-size: 12px;
             font-weight: 700;
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            width: max-content;
+        }
+
+        .contact-details #last-seen {
+            font-size: 10px;
+            color: var(--grey-clr);
         }
 
         .contact-container .username {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
-            font-family: sans-serif;
         }
 
         .contact-container .action {
@@ -192,35 +209,36 @@
         }
 
         .contact-container .phone-number {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 200;
             color: gray;
-        }
-
-        .contact-details #last-seen {
-            font-size: 12px;
         }
 
         .chats-container {
             display: flex;
             flex-direction: column;
-            margin-top: 10px;
-            padding: 0 5px;
+            gap: 0.2rem;
+            margin-top: 12px;
         }
 
         .chat-blog {
-            height: 70px;
-            background-color: whitesmoke;
-            margin: 0 5px;
-            width: 100%;
+            background-color: transparent;
+            width: 98%;
+            margin: 0 auto;
+            padding: 8px 12px;
             display: flex;
-            justify-content: space-around;
-            border-top-left-radius: 5px;
-            border-bottom-left-radius: 5px;
-            border-top-right-radius: 5px;
-            border-bottom-right-radius: 5px;
-            margin: 5px 0;
+            gap: 8px;
+            border-radius: 4px;
             cursor: pointer;
+        }
+
+        .chat-blog.active {
+           background-color: var(--bg-clr);
+        }
+
+        .chat-blog:hover {
+           background-color: rgba(0,0,0,0.1);
+           transition: all .3s ease-in;
         }
 
         .chat-blog .picture {
@@ -233,17 +251,8 @@
 
         .chat-blog .chat-details {
             display: flex;
-            flex-direction: column;
-            flex: 5;
-            height: 100%;
-            padding-left: 5px;
-            padding-right: 5px;
-            padding-top: 5px;
-        }
-
-        .chat-blog .chat-details :first-child {
-            display: flex;
             justify-content: space-between;
+            flex: 1;
         }
 
         .chat-blog .chat-details :first-child .number-of-messages {
@@ -275,7 +284,7 @@
         .incoming-message-content .name,
         .outgoing-message-content .name {
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .chat-details .message,
@@ -286,14 +295,15 @@
             font-weight: 500;
         }
 
-        .status {
-            font-size: 10px;
-            font-weight: 800;
-        }
-
         .message-info {
             display: flex;
             justify-content: space-between;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
         }
 
         .time-sent {
@@ -301,8 +311,11 @@
         }
 
         #message-body {
-            height: 80%;
+            overflow-y: hidden;
+            height: calc(100vh - 60px);
             overflow-y: scroll;
+
+            padding-bottom: 4rem;
         }
 
         #message-body .date {
@@ -310,20 +323,22 @@
             justify-content: center;
             font-size: 10px;
             font-weight: 500;
-            background-color: whitesmoke;
             font-style: italic;
+            color: var(--black-clr);
             margin: 10px 0;
         }
 
         #message-body .conversation-body {
             display: flex;
             justify-content: space-between;
-            padding: 0 5px;
+            padding: 0 16px;
         }
 
         #message-body .conversation-body .incoming-messages,
         #message-body .conversation-body .outgoing-messages {
             flex: 1;
+            max-width: 1024px;
+            margin: 0 auto;
         }
 
         .incoming-message-content,
@@ -331,6 +346,8 @@
             background-color: whitesmoke;
             margin: 5px 0;
             width: fit-content;
+            min-width: 100px;
+            max-width: 60%;
             padding: 5px;
             border-radius: 6px;
         }
@@ -355,7 +372,7 @@
         }
 
         .submit-button {
-            background-color: skyblue;
+            background-color: var(--primary-clr);
             font-size: 15px;
             font-weight: bold;
             font-style: oblique;
@@ -363,17 +380,17 @@
 
         #create-message {
             position: absolute;
-            right: 5px;
-            bottom: 100px;
-            font-size: 10px;
-            background-color: blue;
+            right: 16px;
+            bottom: 16px;
+            font-size: 18px;
+            background-color: var(--primary-clr);
             border-radius: 50%;
-            height: 45px;
-            width: 45px;
+            height: 40px;
+            width: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: var(--white-clr);
             cursor: pointer;
         }
 
@@ -385,6 +402,198 @@
             align-items: center;
             border-radius: 5px;
             cursor: pointer
+        }
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            position: relative;
+        }
+
+        .profile img, .chat-blog img {
+            width: 50px;
+            height: 50px;
+
+            object-fit: cover;
+            object-position: center;
+            border: 3px solid var(--primary-clr);
+            border-radius: 50%;
+
+            cursor: pointer;
+        }
+
+        .profile img:hover {
+            opacity: 0.7;
+            transition: all .3s ease-in;
+        }
+
+        .user-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .user-profile .name {
+            font-size: 12px;
+            font-weight: 700;
+            width: max-content;
+        }
+
+        .user-profile .grey {
+            font-size: 10px;
+            color: var(--grey-clr);
+        }
+
+        .search-bar {
+            margin: 8px 16px 0 16px;
+            background-color: var(--bg-clr);
+            border-radius: 5px;
+
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0 12px;
+            color: var(--grey-clr);
+            font-size: 12px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 4px 0;
+            background-color: transparent;
+        }
+
+        #primary-color {
+            color: var(--primary-clr);
+        }
+
+        #yellow-color {
+            color: var(--accent-clr);
+        }
+
+        #grey-color {
+            color: var(--grey-clr);
+        }
+
+        .other {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .other .number {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .other .number-of-messages {
+            color: var(--white-clr);
+            background-color: var(--primary-clr);
+            border-radius: 50%;
+            padding: 0 4px;
+            font-size: 8px;
+
+            width: fit-content;
+        }
+
+        textarea {
+            outline: none;
+            border: none;
+
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .input-message-box {
+            display: flex;
+            gap: 0.5rem;
+           
+            color: var(--primary-clr);
+            height: 60px;
+            padding: 0 16px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        #send-message {
+            color: var(--primary-clr);
+        }
+
+        .message-blog {
+           position: absolute;
+           bottom: 0;
+           right: 0;
+           left: 0;
+           box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+            background-color: var(--white-clr);
+        }
+
+        .elipsis {
+            width: 200px;
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .max {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        .profile-details {
+            position: absolute;
+            top: 100%;
+            left: 50px;
+            background-color: var(--white-clr);
+
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+
+            border-radius: 4px;
+
+            height: 0;
+            opacity: 0;
+            z-index: -1000;
+            transition: all .3s ease-in;
+        }
+
+        .profile-details.show {
+            height: fit-content;
+            opacity: 1;
+            z-index: 99999;
+        }
+
+        .profile-details .title {
+            font-size: 14px;
+            font-weight: 500;
+            width: max-content;
+            padding: 0 5px;
+        }
+
+        .profile-details .paragraph {
+            font-size: 12px;
+            padding: 0 5px;
+        }
+
+        .logout:hover {
+            background-color: var(--bg-clr);
+        }
+
+        .line {
+            height: 1px;
+            background-color: var(--bg-clr);
         }
     </style>
 }
@@ -436,43 +645,67 @@
         </div>
     </div>
     <div class="current-chats">
+        <div id="create-message">
+            <i class="bi bi-chat-heart"></i>
+        </div>
         <div class="top">
-            <div class="blog-title">
-                <h6>Chats</h6>
-            </div>
-            <div class="add-account">
-                <div id="create">
-                    <i class="bi bi-person-add" style="font-size: 20px"></i>
+            <div class="profile">
+                <img class="click" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZSUyMHBpY3R1cmVzfGVufDB8fDB8fHww" alt="profile" />
+                <div class="profile-details">
+                    <span class="title">Athenkosi Magada</span>
+                    <span class="paragraph">079 689 7899</span>
+                    <div class="line"></div>
+                    <div class="logout">
+                        <partial name="_LogoutPartial" />
+                    </div>
                 </div>
-
-                <div class="logout">
-                    <partial name="_LogoutPartial" />
+                <div class="user-profile">
+                    <span class="name">Athenkosi Magada</span>
+                    <span class="grey">Profile</span>
                 </div>
             </div>
+            <div id="create">
+                <i class="bi bi-plus-lg"></i>
+            </div>
+        </div>
+        <div class="search-bar">
+            <i class="bi bi-search-heart"></i>
+            <input type="text" placeholder="Search name" />
         </div>
         <div class="chats-container">
             @foreach (var recentMessageDto in Model.RecentMessageDtos)
             {
                 <div class="chat-blog">
-                    <div class="picture">
-                        <div class="profile-avatar">
-                            <i class="bi bi-person" style="font-size: 40px"></i>
-                        </div>
-                    </div>
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZSUyMHBpY3R1cmVzfGVufDB8fDB8fHww" alt="profile" />
                     <div class="chat-details">
-                        <div>
-                            <div class="name blog-name">@recentMessageDto.ContactUserName</div>
-                            @if (recentMessageDto.UnreadMessages > 0)
-                            {
-                                <div class="number-of-messages">@recentMessageDto.UnreadMessages</div>
-                            }
+                        <div class="user-profile">
+                            <span class="name">@recentMessageDto.ContactUserName</span>
+                            <span class="message">
+                                @{
+                                    if (recentMessageDto.Status == "Delivered") {
+                                        <i id="primary-color" class="bi bi-check2-circle"></i>
+                                    } else if(recentMessageDto.Status == "Sent") {
+                                        <i id="yellow-color" class="bi bi-check2-circle"></i>
+                                    } else
+                                    {
+                                        <i id="grey-color" class="bi bi-check2-circle"></i>
+                                    }
+                                }
+                                <span class="elipsis">@recentMessageDto.Context</span>
+                            </span>
                         </div>
-                        <div class="message blog-message">
-                            @recentMessageDto.Context
-                        </div>
-                        <div class="message-info">
-                            <div class="status blog-status">@recentMessageDto.Status</div>
+                        <div class="other">
                             <div class="time-sent blog-time-sent">@recentMessageDto.Time</div>
+                            <div class="number">
+                                @if (recentMessageDto.UnreadMessages > 0)
+                                {
+                                    <span class="number-of-messages">@recentMessageDto.UnreadMessages</span>
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -480,21 +713,18 @@
         </div>
     </div>
     <div class="chat hidden">
-        <div style="position: relative; height: 100vh">
-            <div class="chat-topbar">
-                <div class="contact-details">
-                    <span id="name"></span>
-                    <span id="last-seen"></span>
-                </div>
+        <div class="chat-topbar">
+            <div class="contact-details max">
+                <span id="name"></span>
+                <span id="last-seen"></span>
             </div>
-            <div id="message-body"></div>
-            <div class="message-blog"
-                style="position: absolute;bottom: 15px; height: 50px; width: 100%; padding: 0 5px; outline: none">
-                <div class="input-message-box"
-                    style="height: 100%; border-radius: 6px; display: flex">
-                    <input type="text" autofocus id="message" placeholder="Enter text" style="height: 100%; flex: 5; padding: 0 5px; border: none; border-radius: 10px">
-                    <button id="send-message" style="border: none; background-color: transparent"><i class="bi bi-send" style="font-size: 20px"></i></button>
-                </div>
+        </div>
+        <div id="message-body"></div>
+        <div class="message-blog">
+            <div class="input-message-box max">
+                <i class="bi bi-plus-circle-fill"></i>
+                <textarea id="message" placeholder="Type a message"></textarea>
+                <button id="send-message" style="border: none; background-color: transparent"><i class="bi bi-send-fill" style="font-size: 20px"></i></button>
             </div>
         </div>
     </div>
@@ -502,10 +732,6 @@
         <input type="text" name="" id="connection-id">
         <input type="button" value="" id="send-connection-id">
     </form>
-
-    <div id="create-message">
-        <i class="bi bi-chat-right-dots" style="font-size: 20px"></i>
-    </div>
 </div>
 
 @section Scripts {
@@ -517,4 +743,5 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chats.js"></script>
+<script src="~/js/site.js"></script>
 @* <script src="~/js/signal.js"></script> *@
