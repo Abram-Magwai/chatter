@@ -130,7 +130,13 @@
 
         .top {
             display: flex;
-            justify-content: space-evenly;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px 0 16px;
+        }
+
+        .top #create {
+            cursor: pointer;
         }
 
         .chat {
@@ -173,6 +179,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
         }
 
         .logout {
@@ -287,16 +294,19 @@
         }
 
         .profile-avatar {
-            height: 65px;
-            width: 65px;
-            margin-left: 5px;
+            background-color: var(--bg-clr);
+            height: 50px;
+            width: 50px;
+            border: 3px solid var(--primary-clr);
             border-radius: 50%;
-            background-color: lightgray;
             background-size: cover;
             background-repeat: no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
+
+            overflow: hidden;
+            cursor: pointer;
         }
 
         .chat-details .name,
@@ -435,6 +445,86 @@
             padding: 4px 0;
             background-color: transparent;
         }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            position: relative;
+        }
+
+        .profile .profile-avatar:hover {
+            background-color: var(--grey-clr);
+            transition: all .3s ease-in;
+        }
+
+        .profile-details {
+            position: absolute;
+            top: 100%;
+            left: 50px;
+            background-color: var(--white-clr);
+
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+
+            border-radius: 4px;
+
+            height: 0;
+            opacity: 0;
+            z-index: -1000;
+            transition: all .3s ease-in;
+        }
+
+        .profile-details.show {
+            height: fit-content;
+            opacity: 1;
+            z-index: 99999;
+        }
+
+        .profile-details .title {
+            font-size: 14px;
+            font-weight: 500;
+            width: max-content;
+            padding: 0 5px;
+        }
+
+        .profile-details .paragraph {
+            font-size: 12px;
+            padding: 0 5px;
+        }
+
+        .user-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .user-profile .name {
+            font-size: 12px;
+            font-weight: 700;
+            width: max-content;
+        }
+
+        .user-profile .grey {
+            font-size: 10px;
+            color: var(--grey-clr);
+        }
+
+        .logout:hover {
+            background-color: var(--bg-clr);
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .line {
+            height: 1px;
+            background-color: var(--bg-clr);
+        }
+
+        
     </style>
 }
 <div class="background">
@@ -468,7 +558,7 @@
     <div class="contact-list-modal hide">
         <div id="close">
             <button id="close-btn">
-                <i class="bi bi-x-circle" style="font-size: 20px"></i>
+                <i class="bi bi-x-circle"></i>
             </button>
         </div>
         <div id="title" style="text-align: center">
@@ -486,17 +576,26 @@
     </div>
     <div class="current-chats">
         <div class="top">
-            <div class="blog-title">
-                <h6>Chats</h6>
+            <div class="profile">
+                <div class="profile-avatar click">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+         
+                <div class="profile-details">
+                    <span class="title">Athenkosi Magada</span>
+                    <span class="paragraph">079 689 7899</span>
+                    <div class="line"></div>
+                    <div class="logout">
+                        <partial name="_LogoutPartial" />
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <span class="name">Athenkosi Magada</span>
+                    <span class="grey">Profile</span>
+                </div>
             </div>
-            <div class="add-account">
-                <div id="create">
-                    <i class="bi bi-person-add" style="font-size: 20px"></i>
-                </div>
-
-                <div class="logout">
-                    <partial name="_LogoutPartial" />
-                </div>
+            <div id="create">
+                <i class="bi bi-plus-lg"></i>
             </div>
         </div>
         <div class="search-bar">
@@ -509,7 +608,7 @@
                 <div class="chat-blog">
                     <div class="picture">
                         <div class="profile-avatar">
-                            <i class="bi bi-person" style="font-size: 40px"></i>
+                            <i class="bi bi-person-fill"></i>
                         </div>
                     </div>
                     <div class="chat-details">
@@ -570,4 +669,5 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chats.js"></script>
+<script src="~/js/site.js"></script>
 @* <script src="~/js/signal.js"></script> *@
