@@ -414,6 +414,26 @@
             border-radius: 5px;
             cursor: pointer
         }
+
+        .search-bar {
+            margin: 8px 16px 0 16px;
+            background-color: var(--bg-clr);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0 12px;
+            color: var(--grey-clr);
+            font-size: 12px;
+        }
+
+            .search-bar input {
+                flex: 1;
+                border: none;
+                outline: none;
+                padding: 4px 0;
+                background-color: transparent;
+            }
     </style>
 }
 <div class="background">
@@ -477,6 +497,10 @@
                     <partial name="_LogoutPartial" />
                 </div>
             </div>
+        </div>
+        <div class="search-bar">
+            <i class="bi bi-search-heart"></i>
+            <input type="text" placeholder="Search name" />
         </div>
         <div class="chats-container">
             @foreach (var recentMessageDto in Model.RecentMessageDtos)
