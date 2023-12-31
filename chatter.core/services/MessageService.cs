@@ -79,7 +79,7 @@ namespace chatter.core.services
                     Type = message.ReceiverPhoneNumber == userPhoneNumber ? MessageTypesEnums.Received.ToString() : MessageTypesEnums.Sent.ToString(),
                     Time = message.TimeSent.AddHours(2).Hour + ":" + message.TimeSent.Minute
                 };
-                if (chat.Type == MessageTypesEnums.Sent.ToString() && message == messageList[messageList.Count - 1])
+                if (chat.Type == MessageTypesEnums.Sent.ToString())
                     chat.Status = message.Status;
                 chats.Add(chat);
             }

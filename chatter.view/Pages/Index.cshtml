@@ -6,6 +6,18 @@
 }
 @section Styles {
     <style>
+        :root {
+            --primary-clr: #607D8B;
+            --secondary-clr: #FF9800;
+            --accent-clr: #03A9F4;
+            --bg-clr: #eceff1;
+            --white-clr: #fff;
+            --black-clr: #000;
+            --grey-clr: #808080;
+            --light-clr: #108080;
+            --ff-headline: 'Poppins', sans-serif;
+            --ff-body: 'Open Sans', sans-serif;
+        }
         .background {
             background-color: lightgray;
             display: flex;
@@ -241,12 +253,7 @@
             padding-top: 5px;
         }
 
-        .chat-blog .chat-details :first-child {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .chat-blog .chat-details :first-child .number-of-messages {
+        .number-of-messages {
             background-color: blue;
             font-size: 10px;
             width: 20px;
@@ -284,6 +291,7 @@
             font-size: 11px;
             font-style: italic;
             font-weight: 500;
+            margin-right: 8px;
         }
 
         .status {
@@ -291,9 +299,10 @@
             font-weight: 800;
         }
 
-        .message-info {
+        .message-bottom-status {
             display: flex;
             justify-content: space-between;
+            visibility:hidden;
         }
 
         .time-sent {
@@ -333,6 +342,8 @@
             width: fit-content;
             padding: 5px;
             border-radius: 6px;
+            display: flex;
+            align-items: center;
         }
 
         .incoming-message-content {
@@ -385,6 +396,35 @@
             align-items: center;
             border-radius: 5px;
             cursor: pointer
+        }
+
+
+        /* New Styles*/
+        .message-top-info {
+            display: flex;
+            justify-content: space-between
+        }
+
+        .message-body-container {
+            display: flex;
+            align-items: center
+        }
+
+        .message-context {
+            display: flex;
+            align-items: center;
+            flex: 1
+        }
+
+        .check-status{
+            font-size: 20px;
+        }
+        .check-status.read {
+            color: blue;
+        }
+        .message-info {
+            display: flex;
+            align-items: center;
         }
     </style>
 }
@@ -459,20 +499,36 @@
                             <i class="bi bi-person" style="font-size: 40px"></i>
                         </div>
                     </div>
-                    <div class="chat-details">
-                        <div>
+                    <div class="chat-details"> 
+                        <div class="message-top-info">
                             <div class="name blog-name">@recentMessageDto.ContactUserName</div>
-                            @if (recentMessageDto.UnreadMessages > 0)
-                            {
-                                <div class="number-of-messages">@recentMessageDto.UnreadMessages</div>
-                            }
-                        </div>
-                        <div class="message blog-message">
-                            @recentMessageDto.Context
-                        </div>
-                        <div class="message-info">
-                            <div class="status blog-status">@recentMessageDto.Status</div>
                             <div class="time-sent blog-time-sent">@recentMessageDto.Time</div>
+                        </div>
+                        <div class="message-body-container">
+                            <div class="message-context">
+                                @if (@recentMessageDto.Status == "Sent")
+                                {
+                                    <i class="bi bi-check2 check-status"></i>
+                                }
+                                else if (@recentMessageDto.Status == "Delivered")
+                                {
+                                    <i class="bi bi-check2-all check-status"></i>
+                                }
+                                else if (@recentMessageDto.Status == "Read")
+                                {
+                                    <i class="bi bi-check2-all check-status read"></i>
+                                }
+                                <span class="text-message">@recentMessageDto.Context</span>
+                            </div>
+                            <div class="unread-messages-count-container">
+                                @if (recentMessageDto.UnreadMessages > 0)
+                                {
+                                    <div class="number-of-messages">@recentMessageDto.UnreadMessages</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="message-bottom-status">
+                            <div class="status blog-status" style="visibility: hidden">@recentMessageDto.Status</div>
                         </div>
                     </div>
                 </div>
@@ -517,4 +573,3 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chats.js"></script>
-@* <script src="~/js/signal.js"></script> *@

@@ -32,8 +32,7 @@ namespace chatter.core.services
                     else return false;
                 }
                 catch (Exception e)
-                {
-                    
+                {                    
                     error = e.ToString();
                 }                
             }

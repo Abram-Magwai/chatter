@@ -31,19 +31,56 @@ var chatDetails = document.querySelectorAll(".chat-details");
 
 //Sending message to another person
 connection.on("UpdateSentChat", function (chat) {
-    var blogNames = document.querySelectorAll(".blog-name");
-    var statuses = document.querySelectorAll(".blog-status");
-    blogNames.forEach((blogName, index) => {
+    var chatBlogs = document.querySelectorAll(".chat-blog");
+    var statusTick = document.querySelectorAll(".check-status");
+    chatBlogs.forEach((chatBlog, index) => {
+        var blogName = chatBlog.querySelector(".blog-name");
         if (blogName.innerHTML == chat.senderName) {
-            if ((statuses.length >= index) && (statuses[index] != undefined && statuses[index] != "")) {
-                statuses[index].innerHTML = chat.status;
-            }
-            var outgoings = document.querySelectorAll(".outgoing-messages")
-            if (outgoings.length > 1) {
-                outgoings[outgoings.length - 2].children[0].children[2].children[0].innerHTML = "";
-            }
-            outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = chat.status;
+            statusTick = chatBlog.querySelector(".check-status");
 
+            if (statusTick == null) {
+                statusTick = document.createElement("i");
+                statusTick.classList.add("bi");
+                statusTick.classList.add("check-status");
+
+                var messageContext = chatBlog.querySelector(".message-context");
+                messageContext.insertBefore(statusTick, messageContext.children[0]);
+            } else {
+                statusTick.classList.remove("bi-check2");
+                statusTick.classList.remove("bi-check2-all");
+                statusTick.classList.remove("read");
+            }
+
+
+            if (chat.status == "Sent") {
+                statusTick.classList.add("bi-check2");
+            }
+            else if (chat.status == "Delivered" || chat.status == "Read") {
+                statusTick.classList.add("bi-check2-all");
+            }
+            if (chat.status == "Read") {
+                statusTick.classList.add("read");
+            }
+            
+            var outgoings = document.querySelectorAll(".outgoing-messages");
+
+            //Updating inside chat ticks
+            outgoings.forEach(outgoing => {
+                var statusTick = outgoing.children[0].children[1].children[0].children[0];
+                if (chat.status == "Delivered" || chat.status == "Read") {
+                    if (statusTick.classList.contains("bi-check2")) { // 1 tick
+                        statusTick.classList.remove("bi-check2");
+                        statusTick.classList.add("bi-check2-all");
+                        if (chat.status == "Read") {
+                            statusTick.classList.add("read");
+                        }
+                    } else {
+                        if (!statusTick.classList.contains("read") && chat.status == "Read") {
+                            statusTick.classList.add("read");
+                        }
+                    }
+                }
+            })
         }
     });
 });
@@ -100,7 +137,6 @@ connection.on("UpdateChat", function (chat) {
                 document.querySelectorAll(".blog-message")[index].innerHTML = chat.context;
                 document.querySelectorAll(".blog-time-sent")[index].innerHTML = chat.time;
                 if (chat.status == "Delivered") {
-                    var unreadMessages = document.querySelectorAll(".number-of-messages");
                     if (blogs[index].children[1].children[0].children.length == 1) {
                         var unreadMessagesContainer = document.createElement("div");
                         unreadMessagesContainer.classList.add("number-of-messages");
@@ -110,18 +146,8 @@ connection.on("UpdateChat", function (chat) {
                         blogs[index].children[1].children[0].children[1].innerHTML = parseInt(blogs[index].children[1].children[0].children[1].innerHTML) + 1;
                     }
                 }
-
-                if ((statuses.length >= index) && (statuses[index] != undefined && statuses[index] != "")) {
-                    statuses[index].innerHTML = "";
-                }
             }
         });
-        if (document.getElementById("name").innerHTML == chat.sentBy) {
-            var outgoings = document.querySelectorAll(".outgoing-messages")
-            if (outgoings.length >= 1) {
-                outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = "";
-            }
-        }
     } else {
         blogNames.forEach((blogName, index) => {
             if (blogName.innerHTML == chat.receivedBy) {
@@ -131,9 +157,7 @@ connection.on("UpdateChat", function (chat) {
                     statuses[index].innerHTML = chat.status;
                 }
                 var outgoings = document.querySelectorAll(".outgoing-messages")
-                if (outgoings.length > 1) {
-                    outgoings[outgoings.length - 2].children[0].children[2].children[0].innerHTML = "";
-                }
+                outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = statuses[index].innerHTML;
                 outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = statuses[index].innerHTML;
             }
         });
@@ -143,8 +167,9 @@ connection.on("UpdateChat", function (chat) {
 
 
     blogs.forEach((blog, index) => blog.addEventListener("click", () => {
-        if (blog.children[1].children[0].children.length == 2) {
-            blog.children[1].children[0].removeChild(blog.children[1].children[0].lastElementChild);
+        if (blog.children[1].children[1].children.length == 2) {
+            var unreadContainer = document.querySelector(".unread-messages-count-container");
+            unreadContainer.remove();
             var userPhoneNumber = '';
             $.ajax({
                 url: '/?handler=PhoneNumber',
@@ -285,6 +310,7 @@ connection.on("ReceiveMessage", function (chat) {
         }
     });
     if (conversationIndex == -1) { //new chat
+
         var chatsContainer = document.querySelector(".chats-container");
 
         var chatBlogContainer = document.createElement("div");
@@ -299,58 +325,129 @@ connection.on("ReceiveMessage", function (chat) {
         iElement.classList.add("bi");
         iElement.classList.add("bi-person");
         iElement.style.fontSize = "40px";
+
+        // add picture to chat blog
         profileAvatarContainer.appendChild(iElement);
+        pictureContainer.appendChild(profileAvatarContainer);
+        //**************************** */
 
         var chatDetailsContainer = document.createElement("div");
         chatDetailsContainer.classList.add("chat-details");
 
-        var chatDetailsFirstChild = document.createElement("div");
+        var messageTopInfo = document.createElement("div");
+        messageTopInfo.classList.add("message-top-info");
 
-        var blogNameContainer = document.createElement("div");
-        blogNameContainer.classList.add("name");
-        blogNameContainer.classList.add("blog-name");
+        //Message top info (name of chat and time message is sent)
+        var blogNameDiv = document.createElement("div");
+        blogNameDiv.classList.add("name");
+        blogNameDiv.classList.add("blog-name");
+        blogNameDiv.innerHTML = chat.sentBy;
 
-        var numberOfUnreadMessagesContainer = document.createElement("div");
-        numberOfUnreadMessagesContainer.classList.add("number-of-messages");
+        var timeSentDiv = document.createElement("div");
+        timeSentDiv.classList.add("time-sent");
+        timeSentDiv.classList.add("blog-time-sent");
+        timeSentDiv.innerHTML = chat.time;
 
-        var blogMessageContainer = document.createElement("div");
-        blogMessageContainer.classList.add("message");
-        blogMessageContainer.classList.add("blog-message");
+        messageTopInfo.append(blogNameDiv, timeSentDiv);
+        chatDetailsContainer.appendChild(messageTopInfo);
+        //****************************************** */
 
-        var messageInfoContainer = document.createElement("div");
-        messageInfoContainer.classList.add("message-info");
 
-        var blogStatusContainer = document.createElement("div");
-        blogStatusContainer.classList.add("status");
-        blogStatusContainer.classList.add("blog-status");
 
-        var blogTimeSentContainer = document.createElement("div");
-        blogTimeSentContainer.classList.add("time-sent");
-        blogTimeSentContainer.classList.add("blog-time-sent");
 
+        //Message body (text message and unread messages)
+        var messageBodyDiv = document.createElement("div");
+        messageBodyDiv.classList.add("message-body-container");
+
+        var messageContextDiv = document.createElement("div");
+        messageContextDiv.classList.add("message-context");
+
+
+        var textMessageSpan = document.createElement("span");
+        textMessageSpan.classList.add("text-message");
+        textMessageSpan.innerHTML = chat.context;
+
+        var unreadMessagesCountDiv = document.createElement("div");
+        unreadMessagesCountDiv.classList.add("unread-messages-count-container");
+        var numberOfMessagesDiv = document.createElement("div");
+        numberOfMessagesDiv.classList.add("number-of-messages");
+        
+        numberOfMessagesDiv.innerHTML = 1;
+        unreadMessagesCountDiv.appendChild(numberOfMessagesDiv);
+
+
+        messageContextDiv.appendChild(textMessageSpan);
+        messageBodyDiv.append(messageContextDiv, unreadMessagesCountDiv);
+        chatDetailsContainer.appendChild(messageBodyDiv);
+        //************************************************* */
+
+
+
+        // Add elements to the ui
         if (chatsContainer.childElementCount == 0) {
             chatsContainer.appendChild(chatBlogContainer);
         } else {
             chatsContainer.insertBefore(chatBlogContainer, chatsContainer.children[0]);
         }
-        pictureContainer.appendChild(profileAvatarContainer);
-        chatDetailsFirstChild.appendChild(blogNameContainer);
-        messageInfoContainer.appendChild(blogStatusContainer);
-        messageInfoContainer.appendChild(blogTimeSentContainer);
-        chatDetailsContainer.append(chatDetailsFirstChild, blogMessageContainer, messageInfoContainer);
         chatBlogContainer.append(pictureContainer, chatDetailsContainer);
-        var nameContainer = document.querySelector("#name");
-        blogNameContainer.innerHTML = chat.sentBy;
-        blogMessageContainer.innerHTML = chat.context;
-        blogTimeSentContainer.innerHTML = chat.time;
+
+
     } else { //chat exists
         //updating chat blog details
-        var blogNames = document.querySelectorAll(".blog-name");
-        blogNames.forEach((name, index) => {
+        var chatsContainers = document.querySelectorAll(".chats-container");
+        chatsContainers.forEach((container, index) => {
+            var name = container.querySelector(".blog-name");
             if (name.innerHTML == chat.sentBy) {
-                document.querySelectorAll(".message")[index].innerHTML = chat.context;
+                document.querySelectorAll(".text-message")[index].innerHTML = chat.context;
                 document.querySelectorAll(".time-sent")[index].innerHTML = chat.time;
                 document.querySelectorAll(".status")[index].innerHTML = "";
+
+                // This is for when user is the 
+                var statusTick = container.querySelector(".check-status");
+                if (statusTick != null) {
+                    statusTick.remove();
+                }
+                //add unread container
+                if (!chatContainer.classList.contains("hidden")) { // there is open chat
+                    var nameTittle = document.querySelector("#name");
+                    if (nameTittle != null && nameTittle.innerHTML != chat.sentBy) { // if open chat is of the sender
+                        var numberOfMessagesDiv = container.querySelector(".number-of-messages");
+
+                        if (numberOfMessagesDiv == null) { // there are no unread messages
+                            unreadMessageCountDiv = document.createElement("div");
+                            unreadMessageCountDiv.classList.add("unread-message-count-container");
+                            numberOfMessagesDiv = document.createElement("div");
+                            numberOfMessagesDiv.classList.add("number-of-messages");
+                            numberOfMessagesDiv.innerHTML = 1;
+                            unreadMessageCountDiv.appendChild(numberOfMessagesDiv);
+
+                            var messageBodyDiv = container.querySelector(".message-body-container");
+                            messageBodyDiv.appendChild(unreadMessageCountDiv);
+                        } else {
+                            var numberOfMessagesDiv = container.querySelector(".number-of-messages");
+                            var currentUnreadMessages = numberOfMessagesDiv.innerHTML;
+                            numberOfMessagesDiv.innerHTML = currentUnreadMessages + 1;
+                        }
+                    }
+                } else { // no chat open
+                    var numberOfMessagesDiv = container.querySelector(".number-of-messages");
+
+                    if (numberOfMessagesDiv == null) { // there are no unread messages
+                        unreadMessageCountDiv = document.createElement("div");
+                        unreadMessageCountDiv.classList.add("unread-message-count-container");
+                        numberOfMessagesDiv = document.createElement("div");
+                        numberOfMessagesDiv.classList.add("number-of-messages");
+                        numberOfMessagesDiv.innerHTML = 1;
+                        unreadMessageCountDiv.appendChild(numberOfMessagesDiv);
+
+                        var messageBodyDiv = container.querySelector(".message-body-container");
+                        messageBodyDiv.appendChild(unreadMessageCountDiv);
+                    } else {
+                        var numberOfMessagesDiv = container.querySelector(".number-of-messages");
+                        var currentUnreadMessages = numberOfMessagesDiv.innerHTML;
+                        numberOfMessagesDiv.innerHTML = currentUnreadMessages + 1;
+                    }
+                }
 
                 var chatsContainer = document.querySelector(".chats-container");
                 var currentChat = chatsContainer.children[index];
@@ -362,7 +459,7 @@ connection.on("ReceiveMessage", function (chat) {
 
     //check if receiver was on our sender chat
     if (!chatContainer.classList.contains("hidden")) {
-    var nameTittle = document.querySelector("#name");
+        var nameTittle = document.querySelector("#name");
         if (nameTittle != null && nameTittle.innerHTML == chat.sentBy) { // was on the chat
             var messageBodyContainer = document.querySelector("#message-body");
 
@@ -378,14 +475,11 @@ connection.on("ReceiveMessage", function (chat) {
             var conversationBodyContainer = document.createElement("div");
             conversationBodyContainer.classList.add("conversation-body");
 
-            var nameContainer = document.createElement("div");
-            nameContainer.classList.add("name");
-
             var messageContainer = document.createElement("div");
             messageContainer.classList.add("message");
 
-            var messageInfoContainer = document.createElement("div");
-            messageInfoContainer.classList.add("message-info");
+            var messageStatusContainer = document.createElement("div");
+            messageStatusContainer.classList.add("message-info");
 
             var statusContainer = document.createElement("div");
             statusContainer.classList.add("status");
@@ -393,7 +487,6 @@ connection.on("ReceiveMessage", function (chat) {
             var timeSentContainer = document.createElement("div");
             timeSentContainer.classList.add("time-sent");
 
-            nameContainer.innerHTML = document.querySelector("#name").innerHTML;
             messageContainer.innerHTML = chat.context;
             statusContainer.innerHTML = "";
             timeSentContainer.innerHTML = chat.time;
@@ -406,18 +499,13 @@ connection.on("ReceiveMessage", function (chat) {
 
             var incomingMessageContentContainer = document.createElement("div");
             incomingMessageContentContainer.classList.add("incoming-message-content");
-            messageInfoContainer.append(statusContainer, timeSentContainer);
+            messageStatusContainer.append(statusContainer, timeSentContainer);
 
             messageBodyContainer.append(incomingContainer);
             incomingContainer.append(conversationBodyContainer);
             conversationBodyContainer.append(incomingMessagesContainer);
             incomingMessagesContainer.append(incomingMessageContentContainer);
-            incomingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
-
-            var outgoings = document.querySelectorAll(".outgoing-messages");
-            if (outgoings.length >= 1) {
-                outgoings[outgoings.length - 1].children[0].children[2].children[0].innerHTML = "";
-            }
+            incomingMessageContentContainer.append(messageContainer, messageStatusContainer);
 
             //invoke update with read status
             var userPhoneNumber = '';
@@ -432,21 +520,6 @@ connection.on("ReceiveMessage", function (chat) {
             });
         }
     } else {
-        var blogNames = document.querySelectorAll(".blog-name");
-        var blogs = document.querySelectorAll(".chat-blog");
-        var chatDetails = document.querySelectorAll(".chat-details");
-        blogNames.forEach((name, index) => {
-            if (name.innerHTML == chat.sentBy) {
-                if (blogs[index].children[1].children[0].children.length == 1) {
-                    var unreadMessagesContainer = document.createElement("div");
-                    unreadMessagesContainer.classList.add("number-of-messages");
-                    unreadMessagesContainer.innerHTML = 1;
-                    chatDetails[index].firstElementChild.appendChild(unreadMessagesContainer);
-                } else {
-                    blogs[index].children[1].children[0].children[1].innerHTML = parseInt(blogs[index].children[1].children[0].children[1].innerHTML) + 1;
-                }
-            }
-        })
         //invoke update with delivered status
         var userPhoneNumber = '';
         $.ajax({
@@ -719,9 +792,6 @@ if (sendMessageButton != null) {
             var conversationBodyContainer = document.createElement("div");
             conversationBodyContainer.classList.add("conversation-body");
 
-            var nameContainer = document.createElement("div");
-            nameContainer.classList.add("name");
-
             var messageContainer = document.createElement("div");
             messageContainer.classList.add("message");
 
@@ -734,9 +804,14 @@ if (sendMessageButton != null) {
             var timeSentContainer = document.createElement("div");
             timeSentContainer.classList.add("time-sent");
 
-            nameContainer.innerHTML = "You";
+            var statusTick = document.createElement("i");
+            statusTick.classList.add("bi");
+            statusTick.classList.add("bi-check2");
+            statusTick.classList.add("check-status");
+
             messageContainer.innerHTML = textMessage;
-            statusContainer.innerHTML = "Sent";
+            statusContainer.appendChild(statusTick);
+
             var today = new Date();
             timeSentContainer.innerHTML = today.getHours() + ":" + today.getMinutes();
 
@@ -753,19 +828,35 @@ if (sendMessageButton != null) {
             outgoingContainer.append(conversationBodyContainer);
             conversationBodyContainer.append(outgoingMessagesContainer);
             outgoingMessagesContainer.append(outgoingMessageContentContainer);
-            outgoingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
+            outgoingMessageContentContainer.append(messageContainer, messageInfoContainer);
             messageInfoContainer.append(statusContainer, timeSentContainer);
             var outgoings = document.querySelectorAll(".outgoing-messages");
-            if (outgoings.length > 1) {
-                outgoings[outgoings.length - 2].children[0].children[2].children[0].innerHTML = "";
-            }
+            
             messageBodyContainer.scrollTo(0, messageBodyContainer.scrollHeight);
-            var blogNames = document.querySelectorAll(".blog-name");
-            blogNames.forEach((blogName, index) => {
+
+            var chatBlogs = document.querySelectorAll(".chat-blog");
+            chatBlogs.forEach((chatBlog, index) => {
+                var blogName = chatBlog.querySelector(".blog-name");
                 if (blogName.innerHTML == document.getElementById("name").innerHTML) {
-                    document.querySelectorAll(".blog-message")[index].innerHTML = outgoings[outgoings.length - 1].children[0].children[1].innerHTML;
+                    var newMessage = outgoings[outgoings.length - 1].children[0].children[0].innerHTML;
+                    document.querySelectorAll(".text-message")[index].innerHTML = newMessage;
                     document.querySelectorAll(".blog-status")[index].innerHTML = "Sent";
                     document.querySelectorAll(".blog-time-sent")[index].innerHTML = timeSentContainer.innerHTML;
+                    var messageContextDiv = chatBlog.querySelector(".message-context");
+
+                    var statusTick = chatBlog.querySelector(".check-status");
+                    if (statusTick == null) {
+                        statusTick = document.createElement("i");
+                        statusTick.classList.add("bi");
+                        statusTick.classList.add("bi-check2");
+                        statusTick.classList.add("check-status");
+
+                        messageContextDiv.insertBefore(statusTick, messageContextDiv.children[0]);
+                    } else {
+                        statusTick.classList.remove("bi-check2-all");
+                        statusTick.classList.remove("read");
+                        statusTick.classList.add("bi-check2");
+                    }
                 }
             })
 
@@ -792,52 +883,81 @@ if (sendMessageButton != null) {
                 iElement.classList.add("bi");
                 iElement.classList.add("bi-person");
                 iElement.style.fontSize = "40px";
+
+                // add picture to chat blog
                 profileAvatarContainer.appendChild(iElement);
+                pictureContainer.appendChild(profileAvatarContainer);
+                //**************************** */
 
                 var chatDetailsContainer = document.createElement("div");
                 chatDetailsContainer.classList.add("chat-details");
 
-                var chatDetailsFirstChild = document.createElement("div");
+                var messageTopInfo = document.createElement("div");
+                messageTopInfo.classList.add("message-top-info");
 
-                var blogNameContainer = document.createElement("div");
-                blogNameContainer.classList.add("name");
-                blogNameContainer.classList.add("blog-name");
+                //Message top info (name of chat and time message is sent)
+                var blogNameDiv = document.createElement("div");
+                blogNameDiv.classList.add("name");
+                blogNameDiv.classList.add("blog-name");
+                blogNameDiv.innerHTML = document.getElementById("name").innerHTML;
 
-                var numberOfUnreadMessagesContainer = document.createElement("div");
-                numberOfUnreadMessagesContainer.classList.add("number-of-messages");
+                var timeSentDiv = document.createElement("div");
+                timeSentDiv.classList.add("time-sent");
+                timeSentDiv.classList.add("blog-time-sent");
+                timeSentDiv.innerHTML = timeSentContainer.innerHTML;
 
-                var blogMessageContainer = document.createElement("div");
-                blogMessageContainer.classList.add("message");
-                blogMessageContainer.classList.add("blog-message");
+                messageTopInfo.append(blogNameDiv, timeSentDiv);
+                chatDetailsContainer.appendChild(messageTopInfo)
+                //****************************************** */
 
-                var messageInfoContainer = document.createElement("div");
-                messageInfoContainer.classList.add("message-info");
 
-                var blogStatusContainer = document.createElement("div");
-                blogStatusContainer.classList.add("status");
-                blogStatusContainer.classList.add("blog-status");
 
-                var blogTimeSentContainer = document.createElement("div");
-                blogTimeSentContainer.classList.add("time-sent");
-                blogTimeSentContainer.classList.add("blog-time-sent");
 
+                //Message body (ticks, text message and unread messages)
+                var messageBodyDiv = document.createElement("div");
+                messageBodyDiv.classList.add("message-body-container");
+
+                var messageContextDiv = document.createElement("div");
+                messageContextDiv.classList.add("message-context");
+
+                var oneCheckIcon = document.createElement("i");
+                oneCheckIcon.classList.add("bi");
+                oneCheckIcon.classList.add("bi-check2");
+                oneCheckIcon.classList.add("check-status");
+
+                var textMessageSpan = document.createElement("span");
+                textMessageSpan.classList.add("text-message");
+                textMessageSpan.innerHTML = textMessage;
+
+
+                messageContextDiv.append(oneCheckIcon, textMessageSpan);
+                messageBodyDiv.appendChild(messageContextDiv);
+                chatDetailsContainer.appendChild(messageBodyDiv);
+                //************************************************* */
+
+
+
+                // Old message status, will be hidden
+                var messageBottomStatusDiv = document.createElement("div");
+                messageBottomStatusDiv.classList.add("message-bottom-status");
+
+                var bottomStatusDiv = document.createElement("div");
+                bottomStatusDiv.classList.add("status");
+                bottomStatusDiv.classList.add("blog-status");
+                bottomStatusDiv.innerHTML = "Sent";
+
+                messageBottomStatusDiv.appendChild(bottomStatusDiv);
+                chatDetailsContainer.appendChild(messageBottomStatusDiv);
+                //***************************************************** */
+
+
+                // Add elements to the ui
                 if (chatsContainer.childElementCount == 0) {
                     chatsContainer.appendChild(chatBlogContainer);
                 } else {
                     chatsContainer.insertBefore(chatBlogContainer, chatsContainer.children[0]);
                 }
-                pictureContainer.appendChild(profileAvatarContainer);
-                chatDetailsFirstChild.appendChild(blogNameContainer);
-                messageInfoContainer.appendChild(blogStatusContainer);
-                messageInfoContainer.appendChild(blogTimeSentContainer);
-                chatDetailsContainer.append(chatDetailsFirstChild, blogMessageContainer, messageInfoContainer);
                 chatBlogContainer.append(pictureContainer, chatDetailsContainer);
-                var nameContainer = document.querySelector("#name");
-                blogNameContainer.innerHTML = document.getElementById("name").innerHTML;
-                blogMessageContainer.innerHTML = textMessage
-                blogTimeSentContainer.innerHTML = timeSentContainer.innerHTML;
-                blogStatusContainer.innerHTML = "Sent";
-
                 openChat();
             }
             else { //chat exists
@@ -848,6 +968,25 @@ if (sendMessageButton != null) {
                     if (name.innerHTML == nameContainer.innerHTML) {
                         var chatsContainer = document.querySelector(".chats-container");
                         var currentChat = chatsContainer.children[index];
+                        var statusTick = currentChat.querySelector(".check-status")
+                        if (statusTick != null) {
+                            if (statusTick.classList.contains("bi-check2-all")) {
+                                statusTick.classList.remove("bi-check2-all");
+                                if (statusTick.classList.contains("read")) {
+                                    statusTick.classList.remove("read");
+                                }
+                                statusTick.classList.add("bi-check2");
+                            }
+                        } else {
+                            statusTick = document.createElement("i");
+                            statusTick.classList.add("bi");
+                            statusTick.classList.add("bi-check2");
+                            statusTick.classList.add("check-status");
+
+                            var messageContext = chatsContainer.querySelector(".message-context");
+                            messageContext.insertBefore(statusTick, messageContext.children[0]);
+                        }
+
                         chatsContainer.removeChild(currentChat);
                         chatsContainer.insertBefore(currentChat, chatsContainer.children[0]);
                     }
@@ -898,11 +1037,12 @@ function openChat() {
     let usernames = document.querySelectorAll(".name");
 
     blogs.forEach((blog, index) => blog.addEventListener("click", () => {
-        if (blog.children[1].children[0].children.length == 2) {
-            blog.children[1].children[0].removeChild(blog.children[1].children[0].lastElementChild);
-
+        var unreadMessages = blog.querySelector(".number-of-messages");
+        if (unreadMessages != null) { // unread message
+            unreadMessages.remove();
             //update sent chat status
             var userPhoneNumber = '';
+
             $.ajax({
                 url: '/?handler=PhoneNumber',
                 method: 'GET',
@@ -968,9 +1108,6 @@ function openChat() {
                 var conversationBodyContainer = document.createElement("div");
                 conversationBodyContainer.classList.add("conversation-body");
 
-                var nameContainer = document.createElement("div");
-                nameContainer.classList.add("name");
-
                 var messageContainer = document.createElement("div");
                 messageContainer.classList.add("message");
 
@@ -983,8 +1120,9 @@ function openChat() {
                 var timeSentContainer = document.createElement("div");
                 timeSentContainer.classList.add("time-sent");
 
-                nameContainer.innerHTML = message.Type == "Sent" ? "You" : json.ContactName;
                 messageContainer.innerHTML = message.Context;
+
+
                 timeSentContainer.innerHTML = message.Time;
 
                 if (message.Type == "Received") {
@@ -1002,10 +1140,22 @@ function openChat() {
                     incomingContainer.append(conversationBodyContainer);
                     conversationBodyContainer.append(incomingMessagesContainer);
                     incomingMessagesContainer.append(incomingMessageContentContainer);
-                    incomingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
+                    incomingMessageContentContainer.append(messageContainer, messageInfoContainer);
 
                 } else {
-                    statusContainer.innerHTML = message.Status == null ? "" : message.Status;
+                    var statusTick = document.createElement("i");
+                    statusTick.classList.add("bi");
+                    if (message.Status == "Sent") {
+                        statusTick.classList.add("bi-check2");
+                    } else if (message.Status == "Delivered") {
+                        statusTick.classList.add("bi-check2-all");
+                    } else if (message.Status == "Read") {
+                        statusTick.classList.add("bi-check2-all");
+                        statusTick.classList.add("read");
+                    }                    
+                    statusTick.classList.add("check-status");
+
+                    statusContainer.appendChild(statusTick);
                     var outgoingContainer = document.createElement("div");
                     outgoingContainer.classList.add("outgoing");
 
@@ -1019,9 +1169,9 @@ function openChat() {
                     outgoingContainer.append(conversationBodyContainer);
                     conversationBodyContainer.append(outgoingMessagesContainer);
                     outgoingMessagesContainer.append(outgoingMessageContentContainer);
-                    outgoingMessageContentContainer.append(nameContainer, messageContainer, messageInfoContainer);
+                    messageInfoContainer.append(statusContainer, timeSentContainer);
+                    outgoingMessageContentContainer.append(messageContainer, messageInfoContainer);
                 }
-                messageInfoContainer.append(statusContainer, timeSentContainer);
             })
             messageBodyContainer.scrollTo(0, messageBodyContainer.scrollHeight);
         })
