@@ -1,19 +1,43 @@
 ﻿<style>
+    /* Usable variables */
+    :root {
+        --primary-clr: #607D8B;
+        --secondary-clr: #FF9800;
+        --accent-clr: #03A9F4;
+        --bg-clr: #eceff1;
+        --white-clr: #fff;
+        --black-clr: #000;
+        --grey-clr: #808080;
+        --ff-headline: 'Poppins', sans-serif;
+        --ff-body: 'Open Sans', sans-serif;
+    }
+
+    *, *::after, *::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     #logout-button {
         border: none;
         border-radius: 5px;
-        font-size: 10px;
-        font-weight: 500;
+        font-size: 12px;
+        font-weight: 400;
+        text-align: start;
         padding: 5px;
         height: 100%;
-        background-color: #f33737
+        width: 100%;
+        background-color: transparent
     }
+
+        #logout-button:hover {
+        }
 </style>
 @if (User.Identity!.IsAuthenticated)
 {
     <form method="get" asp-page="/Account/Logout">
         <button type="submit" value="Logout" id="logout-button">
-            <i class="bi bi-box-arrow-left" style="font-size: 20px"></i>
+            Log out
         </button>
     </form>
 }
