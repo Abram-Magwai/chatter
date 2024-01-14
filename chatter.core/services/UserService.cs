@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AspNetCore.Identity.MongoDbCore.Models;
 using chatter.core.entities;
 using chatter.core.interfaces;
 using chatter.core.models;
@@ -16,18 +17,18 @@ namespace chatter.core.services
         {
             _applicationUser = applicationUser;
         }
-        public async Task<bool> CreateUserAsync(string phone, string Password)
-        {
-            if (!string.IsNullOrWhiteSpace(phone) && !string.IsNullOrWhiteSpace(Password))
+        public async Task<bool> CreateUserAsync(User user) {
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber) && !string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 ApplicationUser applicationUser = new() { 
-                    UserName = phone, 
-                    PhoneNumber = phone 
+                    UserName = user.UserName, 
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.PhoneNumber
                 };
                 string error;
                 try
                 {
-                    IdentityResult identityResult = await _applicationUser.CreateAsync(applicationUser, Password);
+                    IdentityResult identityResult = await _applicationUser.CreateAsync(applicationUser, user.Password);
                     if (identityResult.Succeeded) return true;
                     else return false;
                 }
@@ -40,15 +41,20 @@ namespace chatter.core.services
         }
         public async Task<ApplicationUser> GetUser(User user)
         {
-            ApplicationUser currentUser = await _applicationUser.FindByNameAsync(user.Username);
+            ApplicationUser currentUser = await _applicationUser.FindByEmailAsync(user.PhoneNumber);
             var result = await _applicationUser.CheckPasswordAsync(currentUser, user.Password);
             if(result)
                 return currentUser;
-            return new();           
+            return new();
         }
         public async Task<ApplicationUser> GetUserByPhone(string phone)
         {
-            ApplicationUser currentUser = await _applicationUser.FindByNameAsync(phone);
+            ApplicationUser currentUser = await _applicationUser.FindByEmailAsync(phone);
+            return currentUser == null ? throw new Exception("User doesn't exists") : currentUser;
+        }
+        public async Task<ApplicationUser> GetUserByUserName(string userName)
+        {
+            ApplicationUser currentUser = await _applicationUser.FindByNameAsync(userName);
             return currentUser == null ? throw new Exception("User doesn't exists") : currentUser;
         }
         public async Task<ClaimsIdentity> AuthenticateAsync(User user, HttpContext httpContext)
@@ -59,7 +65,8 @@ namespace chatter.core.services
                 appUser.Result.IsOnline = true;
                 await _applicationUser.UpdateAsync(appUser.Result);
                 List<Claim> claims = new();
-                claims.Add(new Claim(type: ClaimTypes.MobilePhone, appUser.Result.UserName));
+                claims.Add(new Claim(type: ClaimTypes.MobilePhone, appUser.Result.PhoneNumber));
+                claims.Add(new Claim(type: ClaimTypes.Name, appUser.Result.UserName));
 
                 var claimsIdentity = new ClaimsIdentity(
                     claims, CookieAuthenticationDefaults.AuthenticationScheme);

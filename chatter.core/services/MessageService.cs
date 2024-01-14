@@ -27,8 +27,8 @@ namespace chatter.core.services
             var user = await _userService.GetUserByPhone(userPhoneNumber);
 
             var messageList = (await Task.Run(() => _messageCollection.AsQueryable().Where(message =>
-            ((message.SenderPhoneNumber == user.UserName) && (message.ReceiverPhoneNumber == contact.UserName)) ||
-            ((message.SenderPhoneNumber == contact.UserName && message.ReceiverPhoneNumber == user.UserName))
+            ((message.SenderPhoneNumber == user.PhoneNumber) && (message.ReceiverPhoneNumber == contact.PhoneNumber)) ||
+            ((message.SenderPhoneNumber == contact.PhoneNumber && message.ReceiverPhoneNumber == user.PhoneNumber))
             ))).ToList();
 
             foreach (var message in messageList)
@@ -40,8 +40,8 @@ namespace chatter.core.services
                 }
             }
 
-            var myContact = _contactCollection.AsQueryable().Where(c => (c.CreatorPhoneNumber == userPhoneNumber) && (c.PhoneNumber == contact.UserName)).FirstOrDefault();
-            string contactName = myContact == null ? contact.UserName : myContact.UserName;
+            var myContact = _contactCollection.AsQueryable().Where(c => (c.CreatorPhoneNumber == userPhoneNumber) && (c.PhoneNumber == contact.PhoneNumber)).FirstOrDefault();
+            string contactName = myContact == null ? contact.PhoneNumber : myContact.UserName;
             var lastSeen = string.Empty;
             if (contact.IsOnline)
                 lastSeen = "Online";

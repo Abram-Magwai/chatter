@@ -21,13 +21,13 @@ namespace chatter.core.services
             _applicationUser = applicationUser;
             _messageCollection = messageCollection;
         }
-        public async Task AddContactAsync(Person person, string creatorPhoneNumber)
+        public async Task AddContactAsync(User user, string creatorPhoneNumber)
         {
             var contact = new Contact
             {
                 CreatorPhoneNumber = creatorPhoneNumber,
-                UserName = person.UserName,
-                PhoneNumber = person.PhoneNumber
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber
             };
             await _contactCollection.CreateAsync(contact);
         }

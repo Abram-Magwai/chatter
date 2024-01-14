@@ -297,24 +297,30 @@ connection.on("UpdateChat", function (chat) {
     }))
 
 });
-connection.on("ReceiveMessage", function (chat) {
 
+/*
+    This function will be triggered when someone has sent message to the user
+*/
+
+connection.on("ReceiveMessage", function (chat) {
     var chatContainer = document.querySelector(".chat");
+
     //check on recent messages if sent number exits else add it at top of container
     var blogs = document.querySelectorAll(".chat-blog");
     var conversationIndex = -1;
-
     blogs.forEach((blog, index) => {
         if (blog.children[1].children[0].children[0].innerHTML == chat.sentBy) {
             conversationIndex = index;
         }
     });
-    if (conversationIndex == -1) { //new chat
-
+    /*
+        When conversationIndex is equal to -1, it means it's new conversation
+        We create chat block then put it at the top
+    */
+    if (conversationIndex == -1) {
         var chatsContainer = document.querySelector(".chats-container");
-
         var chatBlogContainer = document.createElement("div");
-        chatBlogContainer.classList.add("chat-blog")
+        chatBlogContainer.classList.add("chat-blog");
 
         var pictureContainer = document.createElement("div");
         pictureContainer.classList.add("picture");
@@ -392,8 +398,7 @@ connection.on("ReceiveMessage", function (chat) {
         chatBlogContainer.append(pictureContainer, chatDetailsContainer);
 
 
-    } else { //chat exists
-        //updating chat blog details
+    } else {
         var chatsContainers = document.querySelectorAll(".chats-container");
         chatsContainers.forEach((container, index) => {
             var name = container.querySelector(".blog-name");
@@ -540,6 +545,10 @@ connection.on("ReceiveMessage", function (chat) {
     }
     openChat();
 });
+
+/*
+    Buttons to close modals
+*/
 var closeButtons = document.querySelectorAll("#close-btn");
 var newContactModal = document.querySelector(".new-contact-modal");
 var contactListModal= document.querySelector(".contact-list-modal");
@@ -568,6 +577,10 @@ createContactButtons.forEach(btn => {
         }
     })
 });
+
+/*
+    Show all contacts
+*/
 
 var newMessageButton = document.querySelector("#create-message");
 newMessageButton.addEventListener("click", () => {
@@ -623,6 +636,11 @@ newMessageButton.addEventListener("click", () => {
 });
 openChat();
 var phoneNumber;
+
+/*
+    Adds functionality for message button since it's not part of the ui at first
+    Once chat is opened, it will pull latest chats if there's conversation already or open chat block with empty conversation
+*/
 
 function MessageFunction() {
     var actionButtons = document.querySelectorAll(".action");
@@ -760,11 +778,19 @@ function MessageFunction() {
         }
     })
 }
+
+/*
+    Sending message to another contact
+*/
+
 var sendMessageButton = document.querySelector("#send-message");
 if (sendMessageButton != null) {
     sendMessageButton.addEventListener("click", () => {
         var textMessage = document.querySelector("#message").value;
         document.querySelector("#message").value = "";
+
+        // There 
+
         if (textMessage.length > 0) {
 
             var date = "Today";
@@ -859,7 +885,10 @@ if (sendMessageButton != null) {
                     }
                 }
             })
-
+            /*
+                Find position of the person user is sending message to from list of recent chats
+                Purpose is to update the index and put it at the top to show it is the most recent message
+            */
             var blogs = document.querySelectorAll(".chat-blog");
             var conversationIndex = -1;
 
@@ -868,7 +897,12 @@ if (sendMessageButton != null) {
                     conversationIndex = index;
                 }
             });
-            if (conversationIndex == -1) { //new chat
+
+            /*
+                When conversationIndex is equal to -1, it means it's new conversation
+                We create chat block then put it at the top
+            */
+            if (conversationIndex == -1) {
                 var chatsContainer = document.querySelector(".chats-container");
 
                 var chatBlogContainer = document.createElement("div");
@@ -960,8 +994,13 @@ if (sendMessageButton != null) {
                 chatBlogContainer.append(pictureContainer, chatDetailsContainer);
                 openChat();
             }
-            else { //chat exists
-                //updating chat blog details
+
+            /*
+                Chat block already exists, means we have conversation already
+                We just update index and put it at the top
+            */
+
+            else {
                 var blogNames = document.querySelectorAll(".blog-name");
                 blogNames.forEach((name, index) => {
                     var nameContainer = document.querySelector("#name");
@@ -992,6 +1031,11 @@ if (sendMessageButton != null) {
                     }
                 })
             }
+
+            /*
+                Get name of person user is sending message to then send message 
+            */
+
             phoneNumber = document.querySelector("#name").innerHTML;
             var userPhoneNumber = '';
             $.ajax({
@@ -1008,6 +1052,11 @@ if (sendMessageButton != null) {
         }
     });
 }
+
+/*
+    Adding new contact to contact list
+*/
+
 var createAccountButton = document.querySelector(".submit-button");
 createAccountButton.addEventListener("click", () => {
     var phoneNumber = document.querySelector("#phone").value;
@@ -1029,15 +1078,27 @@ createAccountButton.addEventListener("click", () => {
             var closeButtons = document.querySelectorAll("#close-btn");
             closeButtons.forEach(button => button.click());
             alert("Account added successfully");
+        } else {
+            console.log("Failed: " + json);
         }
     })
 });
+
+/*
+    Open Chat
+    
+    This function is for handling event when user clicks on chat to open conversation
+*/
 function openChat() {
     var blogs = document.querySelectorAll(".chat-blog");
     let usernames = document.querySelectorAll(".name");
 
     blogs.forEach((blog, index) => blog.addEventListener("click", () => {
         var unreadMessages = blog.querySelector(".number-of-messages");
+
+        /*
+            If message is unread and user clicks on it, send update to the other side to inform the text has been read
+        */
         if (unreadMessages != null) { // unread message
             unreadMessages.remove();
             //update sent chat status
@@ -1053,12 +1114,18 @@ function openChat() {
                 });
             });
         }
+
+        // Reveals conversation container where chats will be displayed since it's hidden at first
         var chatContainer = document.querySelector(".chat");
         if (chatContainer.classList.contains("hidden")) {
             chatContainer.classList.remove("hidden")
             var messageInput = $("#message")[0];
             messageInput.focus();
         }
+
+        /*
+            Retrireve name of chat then pull conversation of that name
+        */
         var username = usernames[index].innerHTML;
         $.ajax({
             url: '/?handler=ConversationByUsername',
@@ -1067,16 +1134,19 @@ function openChat() {
                 contactUserName: username
             }
         }).done(result => {
-            console.log(result)
-            var json = JSON.parse(result);
 
+            /*
+                This occurs when conversation has been pulled from the database
+                It creates conversation ui
+            */
+
+            var json = JSON.parse(result);
             var nameTittle = document.querySelector("#name");
             var lastSeen = document.querySelector("#last-seen");
             nameTittle.innerHTML = json.ContactName;
             lastSeen.innerHTML = json.LastSeen != "Online" ? "Last seen " + json.LastSeen : json.LastSeen;
 
             var messages = json.Messages;
-            var date = '';
             var messageBodyContainer = document.querySelector("#message-body");
             var child = messageBodyContainer.lastElementChild;
             while (child) {
@@ -1140,6 +1210,7 @@ function openChat() {
                     incomingContainer.append(conversationBodyContainer);
                     conversationBodyContainer.append(incomingMessagesContainer);
                     incomingMessagesContainer.append(incomingMessageContentContainer);
+                    messageInfoContainer.append(timeSentContainer);
                     incomingMessageContentContainer.append(messageContainer, messageInfoContainer);
 
                 } else {
@@ -1177,6 +1248,7 @@ function openChat() {
         })
     }))
 }
+
 function checkRecentMessages() {
     var unreadMessages = document.querySelectorAll(".number-of-messages");
     if (unreadMessages.length > 0) {

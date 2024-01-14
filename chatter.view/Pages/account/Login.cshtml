@@ -144,14 +144,14 @@
         <form action="" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div>
-                <input type="text" asp-for="@Model.Logins.PhoneNumber" class="input-field" id="phone"
+                <input type="text" asp-for="@Model.LoginDetails.PhoneNumber" class="input-field" id="phone"
                        placeholder="Phone">
-                <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
+                <div><span asp-validation-for="@Model.LoginDetails.PhoneNumber" class="text-danger"></span></div>
             </div>
             <div>
-                <input type="password" asp-for="@Model.Logins.Password" class="input-field" id="password"
+                <input type="password" asp-for="@Model.LoginDetails.Password" class="input-field" id="password"
                        placeholder="Password">
-                <div><span asp-validation-for="@Model.Logins.Password" class="text-danger"></span></div>
+                <div><span asp-validation-for="@Model.LoginDetails.Password" class="text-danger"></span></div>
             </div>
             <div>
                 <input type="submit" class="submit-button" value="Login">

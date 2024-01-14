@@ -144,12 +144,16 @@
         <form method="post" action="">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div>
-                <input type="text" asp-for="@Model.Logins.PhoneNumber" class="input-field" id="phone" placeholder="Phone">
-                <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
+                <input type="text" asp-for="@Model.UserModel.UserName" class="input-field" id="phone" placeholder="Username">
+                <div><span asp-validation-for="@Model.UserModel.UserName" class="text-danger"></span></div>
             </div>
             <div>
-                <input type="password" asp-for="@Model.Logins.Password" class="input-field" id="password" placeholder="Password">
-                <div><span asp-validation-for="@Model.Logins.PhoneNumber" class="text-danger"></span></div>
+                <input type="text" asp-for="@Model.UserModel.PhoneNumber" class="input-field" id="phone" placeholder="Phone">
+                <div><span asp-validation-for="@Model.UserModel.PhoneNumber" class="text-danger"></span></div>
+            </div>
+            <div>
+                <input type="password" asp-for="@Model.UserModel.Password" class="input-field" id="password" placeholder="Password">
+                <div><span asp-validation-for="@Model.UserModel.Password" class="text-danger"></span></div>
             </div>
             <div>
                 <input type="submit" class="submit-button" value="Create Account">
@@ -160,7 +164,7 @@
 
                 <br />
             }
-            <p class="_question"><span>Don't have an account?</span><a href="/account/login">Login in</a></p>
+            <p class="_question"><span>Don't have an account?</span><a href="/account/login">Login</a></p>
         </form>
     </div>
     <div class="_footer">

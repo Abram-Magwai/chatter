@@ -7,9 +7,10 @@ namespace chatter.core.interfaces
 {
     public interface IUserService
     {
-        Task<bool> CreateUserAsync(string username, string password);
+        Task<bool> CreateUserAsync(User user);
         Task<ClaimsIdentity> AuthenticateAsync(User user, HttpContext httpContext);
         Task<ApplicationUser> GetUser(User user);
         Task<ApplicationUser> GetUserByPhone(string phone);
+        Task<ApplicationUser> GetUserByUserName(string userName);
     }
 }

@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace chatter.view.models
 {
-    public class LoginCredentials
+    public class RegistrationViewModel
     {
+        [Required]
+        public string UserName { get; set; } = null!;
         [Required]
         [Display(Name = "Phone Number")]
         [DataType(DataType.PhoneNumber)]

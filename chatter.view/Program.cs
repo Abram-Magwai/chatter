@@ -1,13 +1,13 @@
-using System.Text;
+using Azure.Storage.Blobs;
 using chatter.core.entities;
 using chatter.core.interfaces;
 using chatter.core.services;
 using chatter.core.settings;
 using chatter.infrastructure.repositories;
+using chatter.view.mappingProfiles;
 using chatter.view.models;
 using chatter.view.services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +24,11 @@ services.AddScoped<IProfileService, ProfileService>();
 services.AddScoped<IMessageService, MessageService>();
 services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
+//Azure
+services.AddSingleton(new BlobServiceClient(builder.Configuration.GetSection("AzureSettings").GetValue<string>("AzureBlobConnectionString")));
+services.AddSingleton<IBlobService, BlobService>();
+services.Configure<AzureSettings>(builder.Configuration.GetSection("AzureSettings"));
+
 services.AddIdentity<ApplicationUser, ApplicationRole>()
 .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
 (
@@ -32,6 +37,7 @@ services.AddIdentity<ApplicationUser, ApplicationRole>()
 
 services.AddSignalR();
 services.AddScoped<ISignalRHub, SignalRHub>();
+services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddCookie(options =>
 {

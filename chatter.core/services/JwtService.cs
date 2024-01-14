@@ -26,7 +26,7 @@ namespace chatter.core.services
         var key = Encoding.ASCII.GetBytes(_appSettings.SecretKey);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { new Claim("username", user.Username??""), new Claim("role", "admin") }),
+            Subject = new ClaimsIdentity(new[] { new Claim("username", user.UserName??""), new Claim("role", "admin") }),
             Issuer = _appSettings.Issuer,
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

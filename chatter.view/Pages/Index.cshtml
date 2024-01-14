@@ -1,5 +1,6 @@
 ﻿@page
 @using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
 @model IndexModel
 @{
     ViewData["Title"] = "Chats";
@@ -600,7 +601,25 @@
             background-color: var(--bg-clr);
         }
 
-    </style>
+        /* Attachment */
+        .attachment-button {
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            cursor: pointer;
+        }
+        .attachment-button.option {
+            margin: 5px 0;
+            justify-content: flex-start;
+            background-color: transparent;
+        }
+
+        .attachment-button.option .bi{
+            margin-right: 10px;
+        }
+</style>
 }
 <div class="background">
     <div class="new-contact-modal hide">
@@ -613,16 +632,16 @@
             <span style="text-align: center">Add new contact</span>
         </div>
         <div id="new-contact-form">
-            <form method="post" action="">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <form method="post" asp-action="">
                 <div>
                     <input type="text" asp-for="@Model.AccountDetails.PhoneNumber" class="input-field" id="phone"
                            placeholder="Phone">
-                    <div><span asp-validation-for="@Model.AccountDetails.PhoneNumber" class="text-danger"></span></div>
+                    <div><span asp-validation-for="@Model.AccountDetails.PhoneNumber" id="phone-number-validation" class="text-danger"></span></div>
                 </div>
                 <div>
                     <input type="text" asp-for="@Model.AccountDetails.UserName" class="input-field" id="username"
                            placeholder="Username">
+                    <div><span asp-validation-for="@Model.AccountDetails.PhoneNumber" id="userName-validation" class="text-danger">Provide Phone Number</span></div>
                 </div>
                 <div>
                     <input type="button" class="submit-button" value="Add Contact">
@@ -660,8 +679,13 @@
                 </div>
 
                 <div class="profile-details">
-                    <span class="title">Athenkosi Magada</span>
-                    <span class="paragraph">079 689 7899</span>
+                    @{
+                        var phoneNumber = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.MobilePhone).FirstOrDefault()!.Value;
+                        var userName = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.Name).FirstOrDefault()!.Value;
+                    }
+                    <span class="title">@userName</span>
+                    
+                    <span class="paragraph">@phoneNumber</span>
                     <div class="line"></div>
                     <div class="logout">
                         <partial name="_LogoutPartial" />
@@ -731,6 +755,24 @@
         <div id="message-body"></div>
         <div class="message-blog">
             <div class="input-message-box">
+                <div id="attachment">
+                    <div style="display: flex; flex-direction: column; position: absolute; bottom: 100px; background-color: #b2b5b7; border-radius: 5px; padding: 5px">
+                        <input type="file" accept="image/*" id="image-input" hidden/>
+                        <div type="file" class="attachment-button option image-attachment">
+                            <i class="bi bi-images"></i>
+                            <div>Photos/Images</div> 
+                        </div>
+                        <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="file-input" hidden />
+                        <div type="file" class="attachment-button option file-attachment">
+                            <i class="bi bi-file-earmark"></i>
+                            <div>Files</div>
+                        </div>
+                    </div>
+                    <div class="attachment-button">
+                        <i class="bi bi-paperclip"></i>
+                    </div>
+                </div>
+                
                 <textarea id="message" placeholder="Type a message"></textarea>
                 <button id="send-message" style="border: none; background-color: transparent"><i class="bi bi-send-fill" style="font-size: 20px"></i></button>
             </div>
@@ -743,12 +785,12 @@
 </div>
 
 @section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chats.js"></script>
+    <script src="~/js/site.js"></script>
+    <script src="~/js/attachment.js"></script>
 }
-
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chats.js"></script>
-<script src="~/js/site.js"></script>

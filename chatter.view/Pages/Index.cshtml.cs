@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.Json;
 using chatter.core.dtos;
 using chatter.core.entities;
 using chatter.core.enums;
 using chatter.core.interfaces;
 using chatter.core.models;
+using chatter.view.models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,7 +22,7 @@ public class IndexModel : PageModel
     private readonly UserManager<ApplicationUser> _applicationUser;
     private readonly IMessageService _messageService;
     [BindProperty]
-    public Account AccountDetails {get;set;} = null!;
+    public ContactViewModel AccountDetails {get;set;} = null!;
     [ViewData]
     public List<LatestMessageDto> RecentMessageDtos { get; set; }
 
@@ -50,10 +50,10 @@ public class IndexModel : PageModel
     }
     public async Task<IActionResult> OnPost()
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return Page();
         var userPhoneNumber = HttpContext.User.Claims.AsQueryable().Where(x => x.Type == ClaimTypes.MobilePhone).First().Value;
-        await _profileService.AddContactAsync(new Person
+        await _profileService.AddContactAsync(new User
         {
             UserName = AccountDetails.UserName,
             PhoneNumber = AccountDetails.PhoneNumber
@@ -67,7 +67,7 @@ public class IndexModel : PageModel
         List<ContactDto> contactsDtos = new();
         for(int i = 0; i < contacts.Count; i++) {
             var contact =  contacts[i];
-            var user = await _applicationUser.FindByNameAsync(contact.PhoneNumber);
+            var user = await _applicationUser.FindByEmailAsync(contact.PhoneNumber);
             var contactDto = new ContactDto
             {
                 ContactId = contact.Id,
@@ -80,7 +80,7 @@ public class IndexModel : PageModel
                 var json = JsonSerializer.Serialize(contactsDtos);
                 return Content(json);
             }
-        }        
+        }
         return Content(JsonSerializer.Serialize(contactsDtos));
     }
     public async Task<IActionResult> OnGetConversation(string contactPhoneNumber)
@@ -125,12 +125,4 @@ public class IndexModel : PageModel
         user.SignalRConnectionId = ConnectionId;
         await _applicationUser.UpdateAsync(user);
     }
-}
-public class Account {
-    [Required]
-    [Display(Name = "Phone Number")]
-    [DataType(DataType.PhoneNumber)]
-    public string PhoneNumber {get;set;} = null!;
-    [Required]
-    public string UserName {get;set;} = null!;
 }

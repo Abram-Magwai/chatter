@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AutoMapper;
 using chatter.core.interfaces;
 using chatter.core.models;
 using chatter.view.models;
@@ -12,11 +13,13 @@ namespace chatter.view.Pages.account
     public class Login : PageModel
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
         [BindProperty]
-        public LoginCredentials Logins { get; set; } = null!;
-        public Login(IUserService userService)
+        public LoginViewModel LoginDetails { get; set; } = null!;
+        public Login(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         public void OnGet()
@@ -27,7 +30,8 @@ namespace chatter.view.Pages.account
         {
             if (ModelState.IsValid)
             {
-                var claimsIdentity = _userService.AuthenticateAsync(new User { Username = Logins.PhoneNumber, Password = Logins.Password }, HttpContext).Result;
+                User user = _mapper.Map<User>(LoginDetails);
+                var claimsIdentity = _userService.AuthenticateAsync(user, HttpContext).Result;
                 if (claimsIdentity.IsAuthenticated)
                 {
                     await HttpContext.SignInAsync(
